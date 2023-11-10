@@ -126,6 +126,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_KVM_SWITCH                   = 0xff010074,
     EIZO_USAGE_HYBRID_GAMMA_PIXEL           = 0xff010077,
     EIZO_USAGE_AUTO_ECOVIEW_SETTINGS_V2     = 0xff010078,
+    EIZO_USAGE_CORRELATION_SENSOR           = 0xff01009b,
     EIZO_USAGE_UNIFORMITY_ENABLE            = 0xff01009d,
     EIZO_USAGE_SAVE                         = 0xff0100a0,
     EIZO_USAGE_FACTORY_RESET                = 0xff0100a1,
@@ -191,10 +192,26 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_USAGE_TIME_RTC               = 0xff030092,
     EIZO_USAGE_SELF_SCHEDULE_MENU_LOCK      = 0xff0300a0,
 
+    EIZO_USAGE_ACC_SENSOR_DATA              = 0xff100030,
+    EIZO_USAGE_ECOVIEW_SENSE_TIME           = 0xff100044,
+    EIZO_USAGE_ECOVIEW_SENSE_POWER_STATE    = 0xff100045,
+    EIZO_USAGE_HAS_SENSOR                   = 0xff1000f0,
+
     EIZO_USAGE_WALL_LIGHT_STATUS            = 0xff230020,
     EIZO_USAGE_WALL_LIGHT_BRIGHTNESS        = 0xff230021,
     EIZO_USAGE_SELF_TARGET_PAIRING          = 0xff230027,
     EIZO_USAGE_SELF_TARGET_ENABLE           = 0xff23002a,
+
+    // This is a list of known usages that some monitors
+    // support but their value is not known.
+    // EIZO_USAGE_OSD_LANGUAGE
+    // EIZO_USAGE_INPUT_RANGE
+    // EIZO_USAGE_INPUT_COLOR_FORMAT
+    // EIZO_USAGE_BACKLIGHT
+    // EIZO_USAGE_SOUND_SELECTION
+    // EIZO_USAGE_ACQUIRE_MUTEX
+    // EIZO_USAGE_RELEASE_MUTEX
+    // EIZO_USAGE_ECOVIEW_SENSITIVITY
 };
 
 enum eizo_temperature : uint16_t {
@@ -526,4 +543,4 @@ int
 eizo_set_usage_time(eizo_handle_t handle, struct eizo_usage_time usage_time);
 
 void
-eizo_dbg_dump_descriptor(struct eizo_handle *handle);
+eizo_dbg_dump_descriptor(eizo_handle_t handle);
