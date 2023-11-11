@@ -140,7 +140,7 @@ static int
 eizo_get_counter(struct eizo_handle *handle, uint16_t *counter) 
 {
     uint8_t buf[3];
-    buf[1] = EIZO_REPORT_ID_COUNTER;
+    buf[0] = EIZO_REPORT_ID_COUNTER;
 
     int res = ioctl(handle->fd, HIDIOCGFEATURE(3), buf);
     if (res < 0) {
