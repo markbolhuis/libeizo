@@ -8,8 +8,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <linux/types.h>
-#include <linux/input.h>
 #include <linux/hidraw.h>
 
 #include "eizo.h"
@@ -188,48 +186,40 @@ eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
         return -1;
     }
 
-    rc = ioctl(handle->fd, HIDIOCGFEATURE(517), buf);
-    if (rc < 0) {
-        perror("HIDIOCGFEATURE");
-        return -1;
-    }
-
-    uint16_t offset = get_unaligned_le16(buf + 1);
-    uint16_t size   = get_unaligned_le16(buf + 3);
-
-    if (offset != 0) {
-        fprintf(stderr, "%s: Invalid offset value in block 0.\n", __func__);
-        return -1;
-    }
-
-    if (size > HID_MAX_DESCRIPTOR_SIZE) {
-        fprintf(stderr, "%s: Descriptor size %u > HID_MAXDESCRIPTOR_SIZE\n", __func__, size);
-        return -1;
-    }
-
-    uint16_t cpy = MIN(size, 512);
-    memcpy(dst, buf + 5, cpy);
-
-    for (uint16_t pos = 512; pos < size; pos += 512) {
+    uint16_t desc_len = 0, pos = 0;
+    do {
         rc = ioctl(handle->fd, HIDIOCGFEATURE(517), buf);
         if (rc < 0) {
             perror("HIDIOCGFEATURE");
             return -1;
         }
 
-        offset = get_unaligned_le16(buf + 1);
-        uint16_t size2 = get_unaligned_le16(buf + 3);
+        uint16_t offset = get_unaligned_le16(buf + 1);
+        uint16_t len    = get_unaligned_le16(buf + 3);
 
-        if (offset != pos || size != size2) {
-            fprintf(stderr, "%s: invalid values in block %u\n", __func__, pos);
+        if (offset != pos) {
+            fprintf(stderr, "%s: Invalid offset %u != %u.", __func__, offset, pos);
             return -1;
         }
 
-        cpy = MIN(size - pos, 512);
-        memcpy(dst + pos, buf + 5, cpy);    
-    }
+        if (desc_len == 0) {
+            if (len > HID_MAX_DESCRIPTOR_SIZE || len == 0) {
+                fprintf(stderr, "%s: Invalid descriptor size %u.", __func__, len);
+                return -1;
+            }
+            desc_len = len;
+        } else if (desc_len != len) {
+            fprintf(stderr, "%s: Invalid length %u at position %u.", __func__, len, pos);
+            return -1;
+        }
 
-    return (ssize_t)size;
+        uint16_t cpy = MIN(desc_len - pos, 512);
+        memcpy(dst + pos, buf + 5, cpy);
+
+        pos += 512;
+    } while (pos < desc_len);
+
+    return (ssize_t)desc_len;
 }
 
 static int
