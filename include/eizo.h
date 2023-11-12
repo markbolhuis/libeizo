@@ -254,6 +254,11 @@ enum eizo_input_mode : uint16_t {
     EIZO_INPUT_MODE_UNKNOWN = 2,
 };
 
+enum eizo_auto_input : uint16_t {
+    EIZO_AUTO_INPUT_DISABLED = false,
+    EIZO_AUTO_INPUT_ENABLED = true,
+};
+
 enum eizo_input_port : uint16_t {
     EIZO_INPUT_PORT_DSUB1      = 0x0100,
     EIZO_INPUT_PORT_DSUB2      = 0x0101,
@@ -277,18 +282,18 @@ enum eizo_input_port : uint16_t {
 };
 
 enum eizo_debug_mode : bool {
-    EIZO_DEBUG_MODE_DISABLE = false,
-    EIZO_DEBUG_MODE_ENABLE = true,
+    EIZO_DEBUG_MODE_DISABLED = false,
+    EIZO_DEBUG_MODE_ENABLED = true,
 };
 
 enum eizo_aging_mode : bool {
-    EIZO_AGING_MODE_DISABLE = false,
-    EIZO_AGING_MODE_ENABLE = true,
+    EIZO_AGING_MODE_DISABLED = false,
+    EIZO_AGING_MODE_ENABLED = true,
 };
 
 enum eizo_usb_power_save : bool {
-    EIZO_USB_POWER_SAVE_DISABLE = false,
-    EIZO_USB_POWER_SAVE_ENABLE = true,
+    EIZO_USB_POWER_SAVE_DISABLED = false,
+    EIZO_USB_POWER_SAVE_ENABLED = true,
 };
 
 enum eizo_usb_power_delivery : uint16_t {
@@ -297,8 +302,8 @@ enum eizo_usb_power_delivery : uint16_t {
 };
 
 enum eizo_power_led : bool {
-    EIZO_POWER_LED_DISABLE = false,
-    EIZO_POWER_LED_ENABLE = true,
+    EIZO_POWER_LED_DISABLED = false,
+    EIZO_POWER_LED_ENABLED = true,
 };
 
 enum eizo_profile : uint16_t {
@@ -364,8 +369,8 @@ enum eizo_power : bool {
 };
 
 enum eizo_window_highlight : bool {
-    EIZO_WINDOW_HIGHLIGHT_DISABLE = false,
-    EIZO_WINDOW_HIGHLIGHT_ENABLE = true,
+    EIZO_WINDOW_HIGHLIGHT_DISABLED = false,
+    EIZO_WINDOW_HIGHLIGHT_ENABLED = true,
 };
 
 enum eizo_window : uint16_t {
@@ -379,25 +384,25 @@ enum eizo_window : uint16_t {
 };
 
 enum eizo_compatibility_mode : bool {
-    EIZO_COMPATIBILITY_MODE_DISABLE = false,
-    EIZO_COMPATIBILITY_MODE_ENABLE = true,
+    EIZO_COMPATIBILITY_MODE_DISABLED = false,
+    EIZO_COMPATIBILITY_MODE_ENABLED = true,
 };
 
 enum eizo_super_resolution : uint16_t {
-    EIZO_SUPER_RESOLUTION_DISABLE = 0,
+    EIZO_SUPER_RESOLUTION_DISABLED = 0,
     EIZO_SUPER_RESOLUTION_STANDARD = 1,
     EIZO_SUPER_RESOLUTION_ENHANCED = 2,
 };
 
 enum eizo_contrast_enhancer : uint16_t {
-    EIZO_CONTRAST_ENHANCER_DISABLE = 0,
+    EIZO_CONTRAST_ENHANCER_DISABLED = 0,
     EIZO_CONTRAST_ENHANCER_STANDARD = 1,
     EIZO_CONTRAST_ENHANCER_ENHANCED = 2,
 };
 
 enum eizo_auto_ecoview : bool {
-    EIZO_AUTO_ECOVIEW_DISABLE = false,
-    EIZO_AUTO_ECOVIEW_ENABLE = true,
+    EIZO_AUTO_ECOVIEW_DISABLED = false,
+    EIZO_AUTO_ECOVIEW_ENABLED = true,
 };
 
 enum eizo_ecoview_ambient_light : uint16_t {
@@ -407,8 +412,8 @@ enum eizo_ecoview_ambient_light : uint16_t {
 };
 
 enum eizo_ecoview_optimizer_v2 : bool {
-    EIZO_ECOVIEW_OPTIMIZER_V2_DISABLE = false,
-    EIZO_ECOVIEW_OPTIMIZER_V2_ENABLE = true,
+    EIZO_ECOVIEW_OPTIMIZER_V2_DISABLED = false,
+    EIZO_ECOVIEW_OPTIMIZER_V2_ENABLED = true,
 };
 
 enum eizo_picture_expansion : uint16_t {
@@ -418,14 +423,14 @@ enum eizo_picture_expansion : uint16_t {
 };
 
 enum eizo_overdrive : uint16_t {
-    EIZO_OVERDRIVE_DISABLE = 0,
+    EIZO_OVERDRIVE_DISABLED = 0,
     EIZO_OVERDRIVE_STANDARD = 1,
     EIZO_OVERDRIVE_ENHANCED = 2,
 };
 
 enum eizo_power_save : bool {
-    EIZO_POWER_SAVE_DISABLE = false,
-    EIZO_POWER_SAVE_ENABLE = true,
+    EIZO_POWER_SAVE_DISABLED = false,
+    EIZO_POWER_SAVE_ENABLED = true,
 };
 
 enum eizo_osd_indicator : uint16_t {
@@ -445,9 +450,9 @@ enum eizo_osd_key_lock : uint16_t {
     EIZO_OSD_KEY_LOCK_ALL = 2,
 };
 
-enum eizo_osd_disable : bool {
-    EIZO_OSD_DISABLE_NO = false,
-    EIZO_OSD_DISABLE_YES = true,
+enum eizo_osd_all_key_lock : bool {
+    EIZO_OSD_ALL_KEY_LOCK_DISABLED = false,
+    EIZO_OSD_ALL_KEY_LOCK_ENABLED = true,
 };
 
 enum eizo_osd_language : int16_t {
@@ -466,6 +471,12 @@ enum eizo_split_display_mode : uint16_t {
     EIZO_SPLIT_DISPLAY_MODE_SINGLE = 0,
     EIZO_SPLIT_DISPLAY_MODE_PICTURE_BY_PICTURE = 1,
     EIZO_SPLIT_DISPLAY_MODE_PICTURE_IN_PICTURE = 2,
+};
+
+enum eizo_picture_by_picture_layout : uint16_t {
+    EIZO_PICTURE_BY_PICTURE_LAYOUT_1 = 0,
+    EIZO_PICTURE_BY_PICTURE_LAYOUT_2 = 1,
+    EIZO_PICTURE_BY_PICTURE_LAYOUT_3 = 2,
 };
 
 enum eizo_button : uint8_t {
