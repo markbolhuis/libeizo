@@ -124,6 +124,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_USB_POWER_DELIVERY           = 0xff010072,
     EIZO_USAGE_USB_SELECTION                = 0xff010073,
     EIZO_USAGE_KVM_SWITCH                   = 0xff010074,
+    EIZO_USAGE_PIP_SHORTCUT_KEY_VISIBLE     = 0xff010075,
     EIZO_USAGE_HYBRID_GAMMA_PIXEL           = 0xff010077,
     EIZO_USAGE_AUTO_ECOVIEW_SETTINGS_V2     = 0xff010078,
     EIZO_USAGE_CORRELATION_SENSOR           = 0xff01009b,
@@ -185,6 +186,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_REAR_LUT                     = 0xff020082,
     EIZO_USAGE_MODEL_NULL                   = 0xff020100,
 
+    EIZO_USAGE_MEASURE_AMBIENT_LIGHT        = 0xff030002,
     EIZO_USAGE_SELF_CALIBRATION_CLOCK_TIME  = 0xff030023,
     EIZO_USAGE_SELF_CORRECTION              = 0xff030025,
     EIZO_USAGE_SELF_NEXT_SCHEDULE           = 0xff030029,
@@ -212,6 +214,7 @@ enum eizo_usage : uint32_t {
     // EIZO_USAGE_ACQUIRE_MUTEX
     // EIZO_USAGE_RELEASE_MUTEX
     // EIZO_USAGE_ECOVIEW_SENSITIVITY
+    // EIZO_USAGE_PICTURE_IN_PICTURE_VISIBLE
 };
 
 enum eizo_temperature : uint16_t {
