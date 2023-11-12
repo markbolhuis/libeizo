@@ -340,7 +340,7 @@ eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 struct eizo_handle *
 eizo_open_path(const char *path)
 {
-    int fd = open(path, O_RDWR);
+    int fd = open(path, O_RDWR | O_CLOEXEC);
     if (fd < 0) {
         fprintf(stderr, "%s: Failed to open %s. %s\n", __func__, path, strerror(errno));
         return nullptr;
