@@ -19,10 +19,10 @@ enum eizo_pid : uint16_t {
     EIZO_PID_FLEXSCAN_EV2785 = 0x4036,
     EIZO_PID_FLEXSCAN_EV3285 = 0x4037,
     EIZO_PID_FLEXSCAN_EV2457 = 0x4044,
+    EIZO_PID_FLEXSCAN_EV2760 = 0x4059,
     EIZO_PID_FLEXSCAN_EV2360 = 0x405a,
     EIZO_PID_FLEXSCAN_EV2460 = 0x405b,
     EIZO_PID_FLEXSCAN_EV2495 = 0x405e,
-    EIZO_PID_FLEXSCAN_EV2760 = 0x4059,
     EIZO_PID_FLEXSCAN_EV2795 = 0x405f,
     EIZO_PID_FLEXSCAN_EV3895 = 0x4065,
     EIZO_PID_FLEXSCAN_EV2480 = 0x406a,
@@ -93,7 +93,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_BUTTON                       = 0xff01003d,
     EIZO_USAGE_SPLIT_DISPLAY_MODE           = 0xff010040,
     EIZO_USAGE_OSD_KEY_LOCK                 = 0xff010044,
-    EIZO_USAGE_OSD_DISABLE                  = 0xff010045,
+    EIZO_USAGE_OSD_ALL_KEY_LOCK             = 0xff010045,
     EIZO_USAGE_INPUT_PORT                   = 0xff010048,
     EIZO_USAGE_FIX_COLOR_BINDING            = 0xff010049,
     EIZO_USAGE_OVERDRIVE                    = 0xff01004a,
@@ -514,7 +514,7 @@ struct eizo_auto_ecoview_settings {
     enum eizo_ecoview_ambient_light min_point_ambient_light;
     uint16_t                        inflection_point_brightness;
     uint16_t                        inflection_point_ambient_light;
-    uint16_t                        adjustMargin_brightness;
+    uint16_t                        adjust_margin_brightness;
     bool                            is_adjustable_brightness;
 };
 
