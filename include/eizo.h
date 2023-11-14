@@ -174,7 +174,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_SYNC_SIGNAL_ENABLE           = 0xff01011e,
     EIZO_USAGE_INSTANT_BRIGHTNESS_BOOSTER   = 0xff010121,
 
-    EIZO_USAGE_DEBUG_MODE                   = 0xff020006,
+    EIZO_USAGE_SELF_CALIBRATION_MODE        = 0xff020006,
     EIZO_USAGE_FRONT_LUT_ENABLED            = 0xff02000d,
     EIZO_USAGE_DUE_ENABLED                  = 0xff02000e,
     EIZO_USAGE_MAX_CANDELA_ROLLBACK         = 0xff02001f,
@@ -291,9 +291,9 @@ enum eizo_input_port : uint16_t {
     EIZO_INPUT_PORT_USBC       = EIZO_INPUT_PORT_DP2,
 };
 
-enum eizo_debug_mode : bool {
-    EIZO_DEBUG_MODE_DISABLED = false,
-    EIZO_DEBUG_MODE_ENABLED = true,
+enum eizo_self_calibration_mode : bool {
+    EIZO_SELF_CALIBRATION_MODE_DISABLED = false,
+    EIZO_SELF_CALIBRATION_MODE_ENABLED = true,
 };
 
 enum eizo_aging_mode : bool {
