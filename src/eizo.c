@@ -259,41 +259,41 @@ eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 struct eizo_handle *
 eizo_open_path(const char *path)
 {
-    int fd = open(path, O_RDWR | O_CLOEXEC);
-    if (fd < 0) {
-        fprintf(stderr, "%s: Failed to open %s. %s\n", __func__, path, strerror(errno));
-        return nullptr;
-    }
-
     struct eizo_handle *h = calloc(1, sizeof *h);
     if (!h) {
         perror("calloc");
         return nullptr;
     }
 
-    int res = ioctl(fd, HIDIOCGRDESCSIZE, &h->descriptor.size);
+    h->fd = open(path, O_RDWR | O_CLOEXEC);
+    if (h->fd < 0) {
+        fprintf(stderr, "%s: Failed to open %s. %s\n", __func__, path, strerror(errno));
+        goto err_open;
+    }
+
+    int res = ioctl(h->fd, HIDIOCGRDESCSIZE, &h->descriptor.size);
     if (res < 0) {
         perror("HIDIOCGRDESCSIZE");
-        goto err;
+        goto err_ioctl;
     }
 
-    res = ioctl(fd, HIDIOCGRDESC, &h->descriptor);
+    res = ioctl(h->fd, HIDIOCGRDESC, &h->descriptor);
     if (res < 0) {
         perror("HIDIOCGRDESC");
-        goto err;
+        goto err_ioctl;
     }
 
-    res = ioctl(fd, HIDIOCGRAWINFO, &h->devinfo);
+    res = ioctl(h->fd, HIDIOCGRAWINFO, &h->devinfo);
     if (res < 0) {
         perror("HIDIOCGRAWINFO");
-        goto err;
+        goto err_ioctl;
     }
 
-    h->fd = fd;
     eizo_get_counter(h, &h->counter);
     return h;
-err:
-    close(fd);
+err_ioctl:
+    close(h->fd);
+err_open:
     free(h);
     return nullptr;
 }
