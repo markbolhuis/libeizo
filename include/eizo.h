@@ -200,6 +200,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_SELF_CORRECTION              = 0xff030025,
     EIZO_USAGE_SELF_NEXT_SCHEDULE           = 0xff030029,
     EIZO_USAGE_SELF_CALIBRATION_MUTEX       = 0xff030080,
+    EIZO_USAGE_SELF_QC_LEA_MEAS_TIMING      = 0xff030040,
     EIZO_USAGE_SELF_QC_LEA_DATA             = 0xff030090,
     EIZO_USAGE_USAGE_TIME_RTC               = 0xff030092,
     EIZO_USAGE_SELF_SCHEDULE_MENU_LOCK      = 0xff0300a0,
@@ -366,6 +367,21 @@ enum eizo_profile : uint16_t {
     EIZO_PROFILE_WEB_SRGB         = 0x002e,
     EIZO_PROFILE_USER             = 0x002f,
     EIZO_PROFILE_REC2020          = 0x0030,
+};
+
+enum eizo_profile_flags : uint16_t {
+    EIZO_PROFILE_FLAGS_BRIGHTNESS          = 0x0001,
+    EIZO_PROFILE_FLAGS_CONTRAST            = 0x0002,
+    EIZO_PROFILE_FLAGS_COLOR_TEMPERATURE   = 0x0004,
+    EIZO_PROFILE_FLAGS_GAMMA               = 0x0008,
+    EIZO_PROFILE_FLAGS_SATURATION          = 0x0010,
+    EIZO_PROFILE_FLAGS_HUE                 = 0x0020,
+    EIZO_PROFILE_FLAGS_GAIN                = 0x0040,
+    EIZO_PROFILE_FLAGS_EX_CONTRAST         = 0x0080,
+    EIZO_PROFILE_FLAGS_SHARPNESS           = 0x0100,
+    EIZO_PROFILE_FLAGS_BLACK_LEVEL         = 0x0200,
+    EIZO_PROFILE_FLAGS_6_COLORS_ADJUSTMENT = 0x0400,
+    EIZO_PROFILE_FLAGS_RESET               = 0x0800,
 };
 
 enum eizo_display_port_version : uint16_t {
