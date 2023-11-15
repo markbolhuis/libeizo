@@ -95,7 +95,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_OSD_KEY_LOCK                 = 0xff010044,
     EIZO_USAGE_OSD_ALL_KEY_LOCK             = 0xff010045,
     EIZO_USAGE_INPUT_PORT                   = 0xff010048,
-    EIZO_USAGE_FIX_COLOR_BINDING            = 0xff010049,
+    EIZO_USAGE_FIX_COLOR_BANDING            = 0xff010049,
     EIZO_USAGE_OVERDRIVE                    = 0xff01004a,
     EIZO_USAGE_GAMUT_INDEX                  = 0xff01004f,
     EIZO_USAGE_SYSTEM_CHROMATICITY          = 0xff010050,
