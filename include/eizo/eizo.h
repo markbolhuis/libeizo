@@ -455,6 +455,14 @@ enum eizo_ecoview_sense_time : uint16_t {
     EIZO_ECOVIEW_SENSE_TIME_60_MIN = 9,
 };
 
+enum eizo_ecoview_sense_power_state : uint16_t {
+    EIZO_ECOVIEW_SENSE_POWER_STATE_RESERVED = 0,
+    EIZO_ECOVIEW_SENSE_POWER_STATE_NO_SIGNAL = 1,
+    EIZO_ECOVIEW_SENSE_POWER_STATE_AB_SENSE = 2,
+    EIZO_ECOVIEW_SENSE_POWER_STATE_DC_OFF = 3,
+    EIZO_ECOVIEW_SENSE_POWER_STATE_EXPECT = 255,
+};
+
 enum eizo_picture_expansion : uint16_t {
     EIZO_PICTURE_EXPANSION_DOT_BY_DOT = 0,
     EIZO_PICTURE_EXPANSION_ASPECT_RATIO = 1,
