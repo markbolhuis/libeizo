@@ -1,5 +1,6 @@
 eizo_inc = [
   'eizo/eizo.h',
+  'eizo/debug.h',
 ]
 
 install_headers(
