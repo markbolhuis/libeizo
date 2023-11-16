@@ -579,6 +579,9 @@ eizo_open_path(const char *path);
 void 
 eizo_close(eizo_handle_t handle);
 
+enum eizo_pid
+eizo_get_pid(eizo_handle_t handle);
+
 int
 eizo_get_value(eizo_handle_t handle, enum eizo_usage usage, uint8_t *value, size_t size);
 

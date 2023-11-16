@@ -306,6 +306,12 @@ eizo_close(struct eizo_handle *handle)
     free(handle);
 }
 
+enum eizo_pid
+eizo_get_pid(struct eizo_handle *handle)
+{
+    return handle->devinfo.product;
+}
+
 int
 eizo_get_brightness(struct eizo_handle *handle, uint16_t *value)
 {
