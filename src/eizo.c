@@ -10,7 +10,7 @@
 
 #include <linux/hidraw.h>
 
-#include "eizo.h"
+#include "eizo/eizo.h"
 #include "utils.h"
 
 enum eizo_report_id : uint8_t {

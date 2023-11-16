@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "eizo.h"
+#include "eizo/eizo.h"
 
 int
 main(int argc, const char *argv[]) 
