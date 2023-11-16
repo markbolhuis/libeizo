@@ -595,5 +595,3 @@ eizo_get_usage_time(eizo_handle_t handle, struct eizo_usage_time *usage_time);
 int
 eizo_set_usage_time(eizo_handle_t handle, struct eizo_usage_time usage_time);
 
-void
-eizo_dbg_dump_descriptor(eizo_handle_t handle);

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "eizo/eizo.h"
+#include "eizo/debug.h"
 
 int
 main(int argc, const char *argv[]) 
