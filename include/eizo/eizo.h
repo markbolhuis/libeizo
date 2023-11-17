@@ -69,7 +69,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_AUTO_ECOVIEW                 = 0xff0000b9,
     EIZO_USAGE_MODEL_STRING_SPACE           = 0xff0000c3,
     EIZO_USAGE_EMERGENCY_POWER              = 0xff0000c5,
-    EIZO_USAGE_INPUT_MODE                   = 0xff0000c9,
+    EIZO_USAGE_INPUT_SIGNAL_MODE            = 0xff0000c9,
     EIZO_USAGE_HORIZONTAL_RESOLUTION        = 0xff0000ca,
     EIZO_USAGE_VERTICAL_RESOLUTION          = 0xff0000cb,
     EIZO_USAGE_POWER_LED                    = 0xff0000d3,
@@ -259,10 +259,10 @@ enum eizo_gamma : uint16_t {
     EIZO_GAMMA_FPS_POWER  = 0xfc,
 };
 
-enum eizo_input_mode : uint16_t {
-    EIZO_INPUT_MODE_ANALOGUE = 0,
-    EIZO_INPUT_MODE_DIGITAL = 1,
-    EIZO_INPUT_MODE_UNKNOWN = 2,
+enum eizo_input_signal_mode : uint16_t {
+    EIZO_INPUT_SIGNAL_MODE_ANALOGUE = 0,
+    EIZO_INPUT_SIGNAL_MODE_DIGITAL = 1,
+    EIZO_INPUT_SIGNAL_MODE_UNKNOWN = 2,
 };
 
 enum eizo_auto_input : bool {
