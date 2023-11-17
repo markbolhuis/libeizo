@@ -265,7 +265,7 @@ enum eizo_input_mode : uint16_t {
     EIZO_INPUT_MODE_UNKNOWN = 2,
 };
 
-enum eizo_auto_input : uint16_t {
+enum eizo_auto_input : bool {
     EIZO_AUTO_INPUT_DISABLED = false,
     EIZO_AUTO_INPUT_ENABLED = true,
 };
@@ -307,9 +307,9 @@ enum eizo_usb_power_save : bool {
     EIZO_USB_POWER_SAVE_ENABLED = true,
 };
 
-enum eizo_usb_power_delivery : uint16_t {
-    EIZO_USB_POWER_DELIVERY_NORMAL = 0,
-    EIZO_USB_POWER_DELIVERY_HIGH = 1,
+enum eizo_usb_power_delivery : bool {
+    EIZO_USB_POWER_DELIVERY_NORMAL = false,
+    EIZO_USB_POWER_DELIVERY_HIGH = true,
 };
 
 enum eizo_power_led : bool {
