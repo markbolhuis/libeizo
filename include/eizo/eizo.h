@@ -169,6 +169,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_OSD_INFORMATION              = 0xff010115,
     EIZO_USAGE_BLUE_ONLY                    = 0xff010117,
     EIZO_USAGE_BLACK_LEVEL_LIFT             = 0xff010119,
+    EIZO_USAGE_LIMITED_109_SETTING          = 0xff01011a,
     EIZO_USAGE_DSHOT                        = 0xff01011b,
     EIZO_USAGE_QUICK_CHECK                  = 0xff01011d,
     EIZO_USAGE_SYNC_SIGNAL_ENABLE           = 0xff01011e,
