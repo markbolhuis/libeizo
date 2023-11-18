@@ -93,7 +93,7 @@ eizo_get_serial_model(struct eizo_handle *handle, char serial[9], char model[17]
 }
 
 [[maybe_unused]]
-static ssize_t
+ssize_t
 eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
 {
     uint8_t buf[517];
@@ -376,32 +376,3 @@ eizo_set_usage_time(struct eizo_handle *handle, struct eizo_usage_time usage)
     buf[2] = usage.minute;
     return eizo_set_value(handle, EIZO_USAGE_USAGE_TIME, buf, 3);
 }
-
-// region Debug
-
-void
-eizo_dbg_dump_descriptor(struct eizo_handle *handle)
-{
-    uint8_t desc[HID_MAX_DESCRIPTOR_SIZE];
-
-    ssize_t n = eizo_get_descriptor(handle, desc);
-    if (n < 0) {
-        fprintf(stderr, "%s: reading the descriptor failed.\n", __func__);
-        return;
-    }
-
-    printf("descriptor size: %ld", n);
-
-    for (ssize_t i = 0; i < n; ++i) {
-        if (i % 16 == 0) {
-            printf("\n");
-        } else {
-            printf(" ");
-        }
-        printf("%02x", desc[i]);
-    }
-
-    printf("\n");
-}
-
-// endregion

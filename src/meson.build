@@ -1,4 +1,7 @@
-src_eizo = ['eizo.c']
+src_eizo = [
+  'eizo.c',
+  'debug.c',
+]
 
 lib_eizo = library(
   'eizo', 
