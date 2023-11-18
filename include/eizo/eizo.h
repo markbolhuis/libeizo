@@ -158,6 +158,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_BLACK_LEVEL                  = 0xff0100cd,
     EIZO_USAGE_SAFE_AREA_MARKER             = 0xff0100ce,
     EIZO_USAGE_3D_LUT_SELECTION             = 0xff0100cf,
+    EIZO_USAGE_COLOR_MATRIX_32              = 0xff0100d8,
     EIZO_USAGE_EV_ACTIVE_WINDOW             = 0xff0100f9,
     EIZO_USAGE_EV_PICTURE_BY_PICTURE_LAYOUT = 0xff0100fa,
     EIZO_USAGE_WHOLE_WINDOW_COLOR_SETTING   = 0xff0100fb,
