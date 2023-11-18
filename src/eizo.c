@@ -313,6 +313,12 @@ eizo_get_pid(struct eizo_handle *handle)
 }
 
 int
+eizo_get_fd(struct eizo_handle *handle)
+{
+    return handle->fd;
+}
+
+int
 eizo_get_brightness(struct eizo_handle *handle, uint16_t *value)
 {
     alignas(uint16_t) uint8_t buf[2];
