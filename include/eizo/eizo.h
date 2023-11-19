@@ -539,6 +539,9 @@ enum eizo_picture_by_picture_layout : uint16_t {
     EIZO_PICTURE_BY_PICTURE_LAYOUT_1 = 0,
     EIZO_PICTURE_BY_PICTURE_LAYOUT_2 = 1,
     EIZO_PICTURE_BY_PICTURE_LAYOUT_3 = 2,
+    EIZO_PICTURE_BY_PICTURE_LAYOUT_4 = 3,
+    EIZO_PICTURE_BY_PICTURE_LAYOUT_5 = 4,
+    EIZO_PICTURE_BY_PICTURE_LAYOUT_6 = 5,
 };
 
 enum eizo_button : uint8_t {
