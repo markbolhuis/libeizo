@@ -241,6 +241,12 @@ enum eizo_usage : uint32_t {
     // EIZO_USAGE_RELEASE_MUTEX
     // EIZO_USAGE_ECOVIEW_SENSITIVITY
     // EIZO_USAGE_PICTURE_IN_PICTURE_VISIBLE
+    // EIZO_USAGE_6AXIS_RED
+    // EIZO_USAGE_6AXIS_GREEN
+    // EIZO_USAGE_6AXIS_BLUE
+    // EIZO_USAGE_6AXIS_CYAN
+    // EIZO_USAGE_6AXIS_MAGENTA
+    // EIZO_USAGE_6AXIS_YELLOW
 };
 
 enum eizo_color_temperature : uint16_t {
@@ -589,6 +595,15 @@ struct eizo_auto_ecoview_settings_v2 {
     uint8_t  dark_point_brightness;
     uint16_t dark_point_ambient_light;
     uint16_t inflection_point_ambient_light;
+};
+
+struct eizo_6axis_colors {
+    uint32_t red;
+    uint32_t green;
+    uint32_t blue;
+    uint32_t cyan;
+    uint32_t magenta;
+    uint32_t yellow;
 };
 
 eizo_handle_t
