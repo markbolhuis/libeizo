@@ -11,7 +11,6 @@
 #include <linux/hidraw.h>
 
 #include "eizo/eizo.h"
-#include "eizo/debug.h"
 #include "utils.h"
 
 enum eizo_report_id : uint8_t {
