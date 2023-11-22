@@ -11,7 +11,6 @@
 #include <linux/hidraw.h>
 
 #include "eizo/eizo.h"
-#include "utils.h"
 
 enum eizo_report_id : uint8_t {
     EIZO_REPORT_ID_DESCRIPTOR = 1,
@@ -337,52 +336,66 @@ eizo_get_fd(struct eizo_handle *handle)
     return handle->fd;
 }
 
+static int
+eizo_get_uint16(struct eizo_handle *handle, enum eizo_usage usage, uint16_t *value)
+{
+    union {
+        uint16_t value;
+        uint8_t buf[2];
+    } u;
+    int res = eizo_get_value(handle, usage, u.buf, 2);
+    if (res >= 0) {
+        *value = le16toh(u.value);
+    }
+    return res;
+}
+
+static int
+eizo_set_uint16(struct eizo_handle *handle, enum eizo_usage usage, uint16_t value)
+{
+    union {
+        uint16_t value;
+        uint8_t buf[2];
+    } u;
+    u.value = htole16(value);
+    return eizo_set_value(handle, usage, u.buf, 2);
+}
+
 int
 eizo_get_brightness(struct eizo_handle *handle, uint16_t *value)
 {
-    alignas(uint16_t) uint8_t buf[2];
-    int res = eizo_get_value(handle, EIZO_USAGE_BRIGHTNESS, buf, 2);
-    if (res == 0) {
-        *value = get_le16(buf);
-    }
-    return res;
+    return eizo_get_uint16(handle, EIZO_USAGE_BRIGHTNESS, value);
 }
 
 int
 eizo_set_brightness(struct eizo_handle *handle, uint16_t value)
 {
-    alignas(uint16_t) uint8_t buf[2];
-    put_le16(buf, value);
-    return eizo_set_value(handle, EIZO_USAGE_BRIGHTNESS, buf, 2);
+    return eizo_set_uint16(handle, EIZO_USAGE_BRIGHTNESS, value);
 }
 
 int
 eizo_get_contrast(struct eizo_handle *handle, uint16_t *value)
 {
-    alignas(uint16_t) uint8_t buf[2];
-    int res = eizo_get_value(handle, EIZO_USAGE_CONTRAST, buf, 2);
-    if (res == 0) {
-        *value = get_le16(buf);
-    }
-    return res;
+    return eizo_get_uint16(handle, EIZO_USAGE_CONTRAST, value);
 }
 
 int
 eizo_set_contrast(struct eizo_handle *handle, uint16_t value)
 {
-    alignas(uint16_t) uint8_t buf[2];
-    put_le16(buf, value);
-    return eizo_set_value(handle, EIZO_USAGE_CONTRAST, buf, 2);
+    return eizo_set_uint16(handle, EIZO_USAGE_CONTRAST, value);
 }
 
 int
 eizo_get_usage_time(struct eizo_handle *handle, struct eizo_usage_time *usage)
 {
-    alignas(uint16_t) uint8_t buf[3];
-    int res = eizo_get_value(handle, EIZO_USAGE_USAGE_TIME, buf, 3);
+    union {
+        uint16_t hour;
+        uint8_t buf[3];
+    } u;
+    int res = eizo_get_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
     if (res == 0) {
-        usage->hour = get_le16(buf + 0);
-        usage->minute = buf[2];
+        usage->hour = le16toh(u.hour);
+        usage->minute = u.buf[2];
     }
     return res;
 }
@@ -390,8 +403,11 @@ eizo_get_usage_time(struct eizo_handle *handle, struct eizo_usage_time *usage)
 int
 eizo_set_usage_time(struct eizo_handle *handle, struct eizo_usage_time usage)
 {
-    alignas(uint16_t) uint8_t buf[3];
-    put_le16(buf + 0, usage.hour);
-    buf[2] = usage.minute;
-    return eizo_set_value(handle, EIZO_USAGE_USAGE_TIME, buf, 3);
+    union {
+        uint16_t hour;
+        uint8_t buf[3];
+    } u;
+    u.hour = htole16(usage.hour);
+    u.buf[2] = usage.minute;
+    return eizo_set_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
 }
