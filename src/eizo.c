@@ -34,36 +34,61 @@ struct eizo_handle {
     struct hidraw_report_descriptor descriptor;
 };
 
-static inline enum eizo_usage
-eizo_get_usage(const uint8_t *ptr)
-{
-    return ((uint32_t)ptr[2]) << 0
-         | ((uint32_t)ptr[3]) << 8
-         | ((uint32_t)ptr[0]) << 16
-         | ((uint32_t)ptr[1]) << 24;
-}
+struct __attribute__((packed)) eizo_descriptor_report {
+    uint8_t  report_id;
+    uint16_t offset;
+    uint16_t length;
+    uint8_t  desc[512];
+};
+static_assert(sizeof(struct eizo_descriptor_report) == 517);
 
-static inline void
-eizo_put_usage(uint8_t *buf, enum eizo_usage usage)
+struct __attribute__((packed)) eizo_value_report {
+    uint8_t  report_id;
+    uint32_t usage;
+    uint16_t counter;
+    uint8_t  value[512];
+};
+static_assert(sizeof(struct eizo_value_report) == 519);
+
+struct __attribute__((packed)) eizo_counter_report {
+    uint8_t  report_id;
+    uint16_t counter;
+};
+static_assert(sizeof(struct eizo_counter_report) == 3);
+
+struct __attribute__((packed)) eizo_verify_report {
+    uint8_t  report_id;
+    uint32_t usage;
+    uint16_t counter;
+    uint8_t  result;
+} ;
+static_assert(sizeof(struct eizo_verify_report) == 8);
+
+
+static inline uint32_t
+eizo_swap_usage(uint32_t value)
 {
-    buf[2] = (uint8_t)(usage >> 0);
-    buf[3] = (uint8_t)(usage >> 8);
-    buf[0] = (uint8_t)(usage >> 16);
-    buf[1] = (uint8_t)(usage >> 24);
+#if BYTE_ORDER == LITTLE_ENDIAN
+    return value << 16 | value >> 16;
+#elif BYTE_ORDER == BIG_ENDIAN
+    return (value & 0x00ff00ff) << 8 | (value & 0xff00ff00) >> 8;
+#else
+#error "Unknown Endian"
+#endif
 }
 
 [[maybe_unused]]
 static int
 eizo_get_counter(struct eizo_handle *handle, uint16_t *counter) 
 {
-    uint8_t buf[3];
-    buf[0] = EIZO_REPORT_ID_COUNTER;
+    struct eizo_counter_report r = {};
+    r.report_id = EIZO_REPORT_ID_COUNTER;
 
-    int res = ioctl(handle->fd, HIDIOCGFEATURE(3), buf);
+    int res = ioctl(handle->fd, HIDIOCGFEATURE(3), &r);
     if (res < 0) {
         fprintf(stderr, "HIDIOCGFEATURE\n");
     } else {
-        *counter = get_unaligned_le16(buf + 1);
+        *counter = le16toh(r.counter);
     }
 
     return res;
@@ -95,11 +120,10 @@ eizo_get_serial_model(struct eizo_handle *handle, char serial[9], char model[17]
 ssize_t
 eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
 {
-    uint8_t buf[517];
-    buf[0] = EIZO_REPORT_ID_DESCRIPTOR;
-    memset(buf + 1, 0, 516);
+    struct eizo_descriptor_report r = {};
+    r.report_id = EIZO_REPORT_ID_DESCRIPTOR;
 
-    int rc = ioctl(handle->fd, HIDIOCSFEATURE(517), buf);
+    int rc = ioctl(handle->fd, HIDIOCSFEATURE(517), &r);
     if (rc < 0) {
         perror("HIDIOCSFEATURE");
         return -1;
@@ -107,33 +131,33 @@ eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
 
     uint16_t desc_len = 0, pos = 0;
     do {
-        rc = ioctl(handle->fd, HIDIOCGFEATURE(517), buf);
+        rc = ioctl(handle->fd, HIDIOCGFEATURE(517), &r);
         if (rc < 0) {
             perror("HIDIOCGFEATURE");
             return -1;
         }
 
-        uint16_t offset = get_unaligned_le16(buf + 1);
-        uint16_t len    = get_unaligned_le16(buf + 3);
+        uint16_t offset = le16toh(r.offset);
+        uint16_t len    = le16toh(r.length);
 
         if (offset != pos) {
-            fprintf(stderr, "%s: Invalid offset %u != %u.", __func__, offset, pos);
+            fprintf(stderr, "%s: Invalid offset %u != %u.\n", __func__, offset, pos);
             return -1;
         }
 
         if (desc_len == 0) {
             if (len > HID_MAX_DESCRIPTOR_SIZE || len == 0) {
-                fprintf(stderr, "%s: Invalid descriptor size %u.", __func__, len);
+                fprintf(stderr, "%s: Invalid descriptor size %u.\n", __func__, len);
                 return -1;
             }
             desc_len = len;
         } else if (desc_len != len) {
-            fprintf(stderr, "%s: Invalid length %u at position %u.", __func__, len, pos);
+            fprintf(stderr, "%s: Invalid length %u at position %u.\n", __func__, len, pos);
             return -1;
         }
 
         uint16_t cpy = MIN(desc_len - pos, 512);
-        memcpy(dst + pos, buf + 5, cpy);
+        memcpy(dst + pos, r.desc, cpy);
 
         pos += 512;
     } while (pos < desc_len);
@@ -144,19 +168,16 @@ eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
 static int
 eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 {
-    uint8_t buf[8];
-    buf[0] = EIZO_REPORT_ID_VERIFY;
-    memset(buf + 1, 0, 7);
+    struct eizo_verify_report r = {};
+    r.report_id = EIZO_REPORT_ID_VERIFY;
 
-    int rc = ioctl(handle->fd, HIDIOCGFEATURE(8), buf);
+    int rc = ioctl(handle->fd, HIDIOCGFEATURE(8), &r);
     if (rc < 0) {
         perror("HIDIOCGFEATURE");
         return rc;
     }
 
-    enum eizo_usage last_usage = eizo_get_usage(buf + 1);
-    uint16_t last_counter = get_unaligned_le16(buf + 5);
-
+    uint16_t last_counter = le16toh(r.counter);
     if (last_counter != handle->counter) {
         // Another handle is communicating with the monitor,
         // causing a race condition.
@@ -165,6 +186,7 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
         return -1;
     }
 
+    enum eizo_usage last_usage = eizo_swap_usage(r.usage);
     if (last_usage != usage) {
         // The process using this handle is reading or writing
         // then verifying out of order.
@@ -173,7 +195,7 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
         return -1;
     }
 
-    if (buf[7] != 0) {
+    if (r.result != 0) {
         // The monitor explicitly rejected the request, usually 
         // because the value was invalid, out of range etc...
         fprintf(stderr, "%s: failed to apply request.\n", __func__);
@@ -187,31 +209,30 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 int
 eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
-    uint8_t buf[519];
+    struct eizo_value_report r = {};
     size_t cap;
 
     if (len <= 32) {
-        buf[0] = EIZO_REPORT_ID_GET;
+        r.report_id = EIZO_REPORT_ID_GET;
         cap = 39;
     } else if (len <= 512) {
-        buf[0] = EIZO_REPORT_ID_GET_V2;
+        r.report_id = EIZO_REPORT_ID_GET_V2;
         cap = 519;
     } else {
         errno = EINVAL;
         return -1;
     }
 
-    eizo_put_usage(buf + 1, usage);
-    put_unaligned_le16(buf + 5, handle->counter);
-    memset(buf + 7, 0, cap - 7);
+    r.usage = eizo_swap_usage(usage);
+    r.counter = htole16(handle->counter);
 
-    int rc = ioctl(handle->fd, HIDIOCSFEATURE(cap), buf);
+    int rc = ioctl(handle->fd, HIDIOCSFEATURE(cap), &r);
     if (rc < 0) {
         perror("HIDIOCSFEATURE");
         return rc;
     }
 
-    rc = ioctl(handle->fd, HIDIOCGFEATURE(cap), buf);
+    rc = ioctl(handle->fd, HIDIOCGFEATURE(cap), &r);
     if (rc < 0) {
         perror("HIDIOCGFEATURE");
         return rc;
@@ -219,7 +240,7 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 
     rc = eizo_verify(handle, usage);
     if (rc >= 0) {
-        memcpy(value, buf + 7, len);
+        memcpy(value, r.value, len);
     }
     return rc;
 }
@@ -227,26 +248,25 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 int
 eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
-    uint8_t buf[519];
+    struct eizo_value_report r = {};
     size_t cap;
 
     if (len <= 32) {
-        buf[0] = EIZO_REPORT_ID_SET;
+        r.report_id = EIZO_REPORT_ID_SET;
         cap = 39;
     } else if (len <= 512) {
-        buf[0] = EIZO_REPORT_ID_SET_V2;
+        r.report_id = EIZO_REPORT_ID_SET_V2;
         cap = 519;
     } else {
         errno = EINVAL;
         return -1;
     }
 
-    eizo_put_usage(buf + 1, usage);
-    put_unaligned_le16(buf + 5, handle->counter);
-    memcpy(buf + 7, value, len);
-    memset(buf + 7 + len, 0, cap - 7 - len);
+    r.usage = eizo_swap_usage(usage);
+    r.counter = htole16(handle->counter);
+    memcpy(r.value, value, len);
 
-    int rc = ioctl(handle->fd, HIDIOCSFEATURE(cap), buf);
+    int rc = ioctl(handle->fd, HIDIOCSFEATURE(cap), &r);
     if (rc < 0) {
         perror("HIDIOCSFEATURE");
         return rc;
