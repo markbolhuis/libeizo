@@ -24,6 +24,11 @@ enum eizo_report_id : uint8_t {
     EIZO_REPORT_ID_INFO       = 9,
 };
 
+enum eizo_ff300009_key : uint8_t {
+    EIZO_FF300009_KEY_RESOLUTION = 0x4c,
+    EIZO_FF300009_KEY_END = 0xff,
+};
+
 struct eizo_handle {
     int fd;
     uint16_t counter;
