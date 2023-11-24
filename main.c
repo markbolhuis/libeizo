@@ -18,6 +18,8 @@ main(int argc, const char *argv[])
     }
 
     eizo_dbg_dump_descriptor(handle);
+    printf("---------\n");
+    eizo_dbg_dump_ff300009(handle);
 
     eizo_close(handle);
     return EXIT_SUCCESS;

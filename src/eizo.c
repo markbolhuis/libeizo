@@ -279,6 +279,23 @@ eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
     return eizo_verify(handle, usage);
 }
 
+int
+eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info)
+{
+    // Assume 256 bytes for now, which seems to be the limit for this report.
+    uint8_t buf[257];
+    buf[0] = EIZO_REPORT_ID_INFO;
+
+    int rc = ioctl(handle->fd, HIDIOCGFEATURE(257), buf);
+    if (rc < 0) {
+        perror("HIDIOCGFEATURE");
+        return -1;
+    }
+
+    memcpy(info, buf + 1, 256);
+    return 0;
+}
+
 
 struct eizo_handle *
 eizo_open_path(const char *path)
