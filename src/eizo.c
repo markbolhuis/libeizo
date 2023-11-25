@@ -415,7 +415,7 @@ eizo_get_usage_time(struct eizo_handle *handle, struct eizo_usage_time *usage)
         uint8_t buf[3];
     } u;
     int res = eizo_get_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
-    if (res == 0) {
+    if (res >= 0) {
         usage->hour = le16toh(u.hour);
         usage->minute = u.buf[2];
     }
