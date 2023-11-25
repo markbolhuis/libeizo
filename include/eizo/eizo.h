@@ -532,7 +532,7 @@ enum eizo_osd_all_key_lock : bool {
     EIZO_OSD_ALL_KEY_LOCK_ENABLED = true,
 };
 
-enum eizo_osd_language : int16_t {
+enum eizo_osd_language : uint16_t {
     EIZO_OSD_LANGUAGE_ENGLISH = 0,
     EIZO_OSD_LANGUAGE_GERMAN = 1,
     EIZO_OSD_LANGUAGE_FRENCH = 2,
