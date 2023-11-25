@@ -47,6 +47,8 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
         return;
     }
 
+    printf("info size: %d\n", size);
+
     int i = 0;
     while (i < size) {
         int key = info[i++];
