@@ -41,17 +41,17 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 {
     uint8_t info[256];
 
-    int rc = eizo_get_ff300009(handle, info);
-    if (rc < 0) {
+    int size = eizo_get_ff300009(handle, info);
+    if (size < 0) {
         fprintf(stderr, "%s: reading ff300009 info failed.\n", __func__);
         return;
     }
 
     int i = 0;
-    while (i < 256) {
+    while (i < size) {
         int key = info[i++];
         printf("%02x", key);
-        if (key == 0xff || i == 256) {
+        if (key == 0xff || i == size) {
             printf("\n");
             break;
         }
@@ -59,7 +59,7 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
         int len = info[i++];
         printf(" %02x", len);
 
-        if ((i + len) > 256) {
+        if ((i + len) > size) {
             len = 256 - i;
         }
 
