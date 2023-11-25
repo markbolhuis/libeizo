@@ -627,6 +627,9 @@ eizo_get_pid(eizo_handle_t handle);
 int
 eizo_get_fd(eizo_handle_t handle);
 
+unsigned long
+eizo_get_serial(struct eizo_handle *handle);
+
 int
 eizo_get_value(eizo_handle_t handle, enum eizo_usage usage, uint8_t *value, size_t size);
 

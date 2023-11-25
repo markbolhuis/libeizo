@@ -32,7 +32,7 @@ enum eizo_ff300009_key : uint8_t {
 struct eizo_handle {
     int fd;
     uint16_t counter;
-    char serial[9];
+    unsigned long serial;
     char model[17];
     struct hidraw_devinfo devinfo;
     struct hidraw_report_descriptor descriptor;
@@ -100,7 +100,10 @@ eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
 
 [[maybe_unused]]
 static int
-eizo_get_serial_model(struct eizo_handle *handle, char serial[9], char model[17]) 
+eizo_get_serial_model(
+    struct eizo_handle *handle,
+    unsigned long *serial,
+    char model[17])
 {
     char buf[25];
     buf[0] = EIZO_REPORT_ID_SN_MODEL;
@@ -111,11 +114,19 @@ eizo_get_serial_model(struct eizo_handle *handle, char serial[9], char model[17]
         return -1;
     }
 
-    strncpy(serial, buf + 1, 8);
-    serial[8] = '\0';
-
     strncpy(model, buf + 9, 16);
     model[16] = '\0';
+
+    buf[9] = '\0';
+    char *end = nullptr;
+    unsigned long sn = strtoul(buf + 1, &end, 10);
+
+    if (end == buf + 9) {
+        *serial = sn;
+    } else {
+        fprintf(stderr, "%s: failed to convert serial string to ulong.\n",
+                __func__);
+    }
 
     return 0;
 }
@@ -356,6 +367,12 @@ int
 eizo_get_fd(struct eizo_handle *handle)
 {
     return handle->fd;
+}
+
+unsigned long
+eizo_get_serial(struct eizo_handle *handle)
+{
+    return handle->serial;
 }
 
 static int
