@@ -91,11 +91,11 @@ eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
     int res = ioctl(handle->fd, HIDIOCGFEATURE(3), &r);
     if (res < 0) {
         fprintf(stderr, "HIDIOCGFEATURE\n");
-    } else {
-        *counter = le16toh(r.counter);
+        return -1;
     }
 
-    return res;
+    *counter = le16toh(r.counter);
+    return 0;
 }
 
 [[maybe_unused]]
