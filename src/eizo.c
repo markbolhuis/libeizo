@@ -307,7 +307,7 @@ eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info)
         memcpy(info, buf + 1, size - 1);
     }
 
-    return size;
+    return size == 0 ? 0 : size - 1;
 }
 
 

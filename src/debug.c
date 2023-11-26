@@ -62,7 +62,7 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
         printf(" %02x", len);
 
         if ((i + len) > size) {
-            len = 256 - i;
+            len = size - i;
         }
 
         for (int j = i; j < (i + len); ++j) {
