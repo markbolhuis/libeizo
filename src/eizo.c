@@ -297,14 +297,17 @@ eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info)
     uint8_t buf[257];
     buf[0] = EIZO_REPORT_ID_INFO;
 
-    int rc = ioctl(handle->fd, HIDIOCGFEATURE(257), buf);
-    if (rc < 0) {
+    int size = ioctl(handle->fd, HIDIOCGFEATURE(257), buf);
+    if (size < 0) {
         perror("HIDIOCGFEATURE");
         return -1;
     }
 
-    memcpy(info, buf + 1, rc);
-    return rc;
+    if (size > 1) {
+        memcpy(info, buf + 1, size - 1);
+    }
+
+    return size;
 }
 
 
