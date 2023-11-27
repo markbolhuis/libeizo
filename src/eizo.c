@@ -32,9 +32,9 @@ enum eizo_ff300009_key : uint8_t {
 struct eizo_handle {
     int fd;
     uint16_t counter;
+    enum eizo_pid pid;
     unsigned long serial;
     char model[17];
-    struct hidraw_devinfo devinfo;
     struct hidraw_report_descriptor descriptor;
 };
 
@@ -332,6 +332,21 @@ eizo_get_hidraw_descriptor(struct eizo_handle *handle)
     return 0;
 }
 
+static int
+eizo_get_hidraw_devinfo(struct eizo_handle *handle)
+{
+    struct hidraw_devinfo devinfo = {};
+
+    int res = ioctl(handle->fd, HIDIOCGRAWINFO, &devinfo);
+    if (res < 0) {
+        perror("HIDIOCGRAWINFO");
+        return -1;
+    }
+
+    handle->pid = devinfo.product;
+    return 0;
+}
+
 struct eizo_handle *
 eizo_open_path(const char *path)
 {
@@ -350,19 +365,18 @@ eizo_open_path(const char *path)
     int res = eizo_get_hidraw_descriptor(h);
     if (res < 0) {
         fprintf(stderr, "%s: Failed to read hidraw descriptor.\n", __func__);
-        goto err_desc;
+        goto err_hidraw;
     }
 
-    res = ioctl(h->fd, HIDIOCGRAWINFO, &h->devinfo);
+    res = eizo_get_hidraw_devinfo(h);
     if (res < 0) {
-        perror("HIDIOCGRAWINFO");
-        goto err_ioctl;
+        fprintf(stderr, "%s: Failed to read hidraw devinfo.\n", __func__);
+        goto err_hidraw;
     }
 
     eizo_get_counter(h, &h->counter);
     return h;
-err_desc:
-err_ioctl:
+err_hidraw:
     close(h->fd);
 err_open:
     free(h);
@@ -379,7 +393,7 @@ eizo_close(struct eizo_handle *handle)
 enum eizo_pid
 eizo_get_pid(struct eizo_handle *handle)
 {
-    return handle->devinfo.product;
+    return handle->pid;
 }
 
 int
