@@ -225,7 +225,7 @@ static int
 eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
     struct eizo_value_report r = {};
-    size_t cap;
+    unsigned long cap;
 
     if (len <= 32) {
         r.report_id = EIZO_REPORT_ID_GET;
@@ -264,7 +264,7 @@ static int
 eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
     struct eizo_value_report r = {};
-    size_t cap;
+    unsigned long cap;
 
     if (len <= 32) {
         r.report_id = EIZO_REPORT_ID_SET;
