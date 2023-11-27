@@ -311,6 +311,27 @@ eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info)
 }
 
 
+static int
+eizo_get_hidraw_descriptor(struct eizo_handle *handle)
+{
+    int size = -1;
+
+    int res = ioctl(handle->fd, HIDIOCGRDESCSIZE, &size);
+    if (res < 0 || size < 0) {
+        perror("HIDIOCGRDESCSIZE");
+        return -1;
+    }
+
+    handle->descriptor.size = size;
+    res = ioctl(handle->fd, HIDIOCGRDESC, &handle->descriptor);
+    if (res < 0) {
+        perror("HIDIOCGRDESC");
+        return -1;
+    }
+
+    return 0;
+}
+
 struct eizo_handle *
 eizo_open_path(const char *path)
 {
@@ -326,16 +347,10 @@ eizo_open_path(const char *path)
         goto err_open;
     }
 
-    int res = ioctl(h->fd, HIDIOCGRDESCSIZE, &h->descriptor.size);
+    int res = eizo_get_hidraw_descriptor(h);
     if (res < 0) {
-        perror("HIDIOCGRDESCSIZE");
-        goto err_ioctl;
-    }
-
-    res = ioctl(h->fd, HIDIOCGRDESC, &h->descriptor);
-    if (res < 0) {
-        perror("HIDIOCGRDESC");
-        goto err_ioctl;
+        fprintf(stderr, "%s: Failed to read hidraw descriptor.\n", __func__);
+        goto err_desc;
     }
 
     res = ioctl(h->fd, HIDIOCGRAWINFO, &h->devinfo);
@@ -346,6 +361,7 @@ eizo_open_path(const char *path)
 
     eizo_get_counter(h, &h->counter);
     return h;
+err_desc:
 err_ioctl:
     close(h->fd);
 err_open:
