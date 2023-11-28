@@ -12,7 +12,7 @@ main(int argc, const char *argv[])
         return EXIT_FAILURE;
     }
 
-    eizo_handle_t handle = eizo_open_path(argv[1]);
+    eizo_handle_t handle = eizo_open_hidraw(argv[1]);
     if (!handle) {
         return EXIT_FAILURE;
     }

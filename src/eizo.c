@@ -348,7 +348,7 @@ eizo_get_hidraw_devinfo(struct eizo_handle *handle)
 }
 
 struct eizo_handle *
-eizo_open_path(const char *path)
+eizo_open_hidraw(const char *path)
 {
     struct eizo_handle *h = calloc(1, sizeof *h);
     if (!h) {

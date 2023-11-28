@@ -634,7 +634,7 @@ struct eizo_6axis_colors {
 };
 
 eizo_handle_t
-eizo_open_path(const char *path);
+eizo_open_hidraw(const char *path);
 
 void 
 eizo_close(eizo_handle_t handle);
