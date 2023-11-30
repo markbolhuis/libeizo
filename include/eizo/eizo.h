@@ -257,6 +257,15 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_SELF_TARGET_PAIRING          = 0xff230027,
     EIZO_USAGE_SELF_TARGET_ENABLE           = 0xff23002a,
 
+    EIZO_USAGE_SECONDARY_DESCRIPTOR         = 0xff300001,
+    EIZO_USAGE_SET_VALUE                    = 0xff300002,
+    EIZO_USAGE_GET_VALUE                    = 0xff300003,
+    EIZO_USAGE_SET_VALUE_V2                 = 0xff300004,
+    EIZO_USAGE_GET_VALUE_V2                 = 0xff300005,
+    EIZO_USAGE_HANDLE_COUNTER               = 0xff300006,
+    EIZO_USAGE_VERIFY_LAST_REQUEST          = 0xff300007,
+    EIZO_USAGE_SERIAL_PRODUCT_STRING        = 0xff300008,
+
     // This is a list of known usages that some monitors
     // support but their value is not known.
     // EIZO_USAGE_OSD_LANGUAGE
