@@ -3,13 +3,9 @@
 
 #include <linux/hid.h>
 
+#include "eizo/eizo.h"
 #include "eizo/debug.h"
-
-extern ssize_t
-eizo_get_descriptor(struct eizo_handle *handle, uint8_t *desc);
-
-extern int
-eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info);
+#include "internal.h"
 
 void
 eizo_dbg_dump_descriptor(struct eizo_handle *handle)
