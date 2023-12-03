@@ -73,7 +73,7 @@ eizo_get_serial_model(
 }
 
 [[maybe_unused]]
-ssize_t
+int
 eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
 {
     struct eizo_descriptor_report r = {};
@@ -118,7 +118,7 @@ eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
         pos += 512;
     } while (pos < desc_len);
 
-    return (ssize_t)desc_len;
+    return (int)desc_len;
 }
 
 static int

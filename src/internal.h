@@ -64,7 +64,7 @@ eizo_swap_usage(uint32_t value)
 #endif
 }
 
-ssize_t
+int
 eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst);
 
 int
