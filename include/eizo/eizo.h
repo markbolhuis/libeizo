@@ -657,6 +657,9 @@ eizo_get_fd(eizo_handle_t handle);
 unsigned long
 eizo_get_serial(struct eizo_handle *handle);
 
+const char *
+eizo_get_model(struct eizo_handle *handle);
+
 int
 eizo_get_brightness(eizo_handle_t handle, uint16_t *value);
 

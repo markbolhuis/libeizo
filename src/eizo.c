@@ -55,8 +55,14 @@ eizo_get_serial_model(
         return -1;
     }
 
-    strncpy(model, buf + 9, 16);
-    model[16] = '\0';
+    int i;
+    for (i = 0; i < 16; ++i) {
+        if (buf[9 + i] == ' ') {
+            break;
+        }
+        model[i] = buf[9 + i];
+    }
+    model[i] = '\0';
 
     buf[9] = '\0';
     char *end = nullptr;
@@ -316,6 +322,7 @@ eizo_open_hidraw(const char *path)
     }
 
     eizo_get_counter(h, &h->counter);
+    eizo_get_serial_model(h, &h->serial, h->model);
     return h;
 err_hidraw:
     close(h->fd);
@@ -347,6 +354,12 @@ unsigned long
 eizo_get_serial(struct eizo_handle *handle)
 {
     return handle->serial;
+}
+
+const char *
+eizo_get_model(struct eizo_handle *handle)
+{
+    return handle->model;
 }
 
 static int
