@@ -655,10 +655,10 @@ int
 eizo_get_fd(eizo_handle_t handle);
 
 unsigned long
-eizo_get_serial(struct eizo_handle *handle);
+eizo_get_serial(eizo_handle_t handle);
 
 const char *
-eizo_get_model(struct eizo_handle *handle);
+eizo_get_model(eizo_handle_t handle);
 
 int
 eizo_get_brightness(eizo_handle_t handle, uint16_t *value);
