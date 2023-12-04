@@ -49,7 +49,7 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
     while (i < size) {
         int key = info[i++];
         printf("%02x", key);
-        if (key == 0xff || i == size) {
+        if (key == EIZO_FF300009_KEY_END || i == size) {
             printf("\n");
             break;
         }
