@@ -5,6 +5,9 @@
 
 struct eizo_handle;
 
+// Assume 256 bytes for now, which seems to be the limit for this report.
+#define EIZO_FF300009_MAX_SIZE 256
+
 enum eizo_report_id : uint8_t {
     EIZO_REPORT_ID_DESCRIPTOR = 1,
     EIZO_REPORT_ID_SET        = 2,

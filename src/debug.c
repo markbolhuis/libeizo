@@ -35,7 +35,7 @@ eizo_dbg_dump_descriptor(struct eizo_handle *handle)
 void
 eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 {
-    uint8_t info[256];
+    uint8_t info[EIZO_FF300009_MAX_SIZE];
 
     int size = eizo_get_ff300009(handle, info);
     if (size < 0) {
