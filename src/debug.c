@@ -8,11 +8,11 @@
 #include "internal.h"
 
 void
-eizo_dbg_dump_descriptor(struct eizo_handle *handle)
+eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
 {
     uint8_t desc[HID_MAX_DESCRIPTOR_SIZE];
 
-    int n = eizo_get_descriptor(handle, desc);
+    int n = eizo_get_secondary_descriptor(handle, desc);
     if (n < 0) {
         fprintf(stderr, "%s: reading the descriptor failed.\n", __func__);
         return;

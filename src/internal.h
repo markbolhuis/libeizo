@@ -68,7 +68,7 @@ eizo_swap_usage(uint32_t value)
 }
 
 int
-eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst);
+eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst);
 
 int
 eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info);

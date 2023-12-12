@@ -17,7 +17,7 @@ main(int argc, const char *argv[])
         return EXIT_FAILURE;
     }
 
-    eizo_dbg_dump_descriptor(handle);
+    eizo_dbg_dump_secondary_descriptor(handle);
     printf("---------\n");
     eizo_dbg_dump_ff300009(handle);
 

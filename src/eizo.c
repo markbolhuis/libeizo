@@ -80,7 +80,7 @@ eizo_get_serial_model(
 
 [[maybe_unused]]
 int
-eizo_get_descriptor(struct eizo_handle *handle, uint8_t *dst)
+eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst)
 {
     struct eizo_descriptor_report r = {};
     r.report_id = EIZO_REPORT_ID_DESCRIPTOR;
