@@ -20,6 +20,8 @@ main(int argc, const char *argv[])
     eizo_dbg_dump_secondary_descriptor(handle);
     printf("---------\n");
     eizo_dbg_dump_ff300009(handle);
+    printf("---------\n");
+    eizo_dbg_poll(handle);
 
     eizo_close(handle);
     return EXIT_SUCCESS;

@@ -1,6 +1,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include <poll.h>
+#include <unistd.h>
+
 #include <linux/hid.h>
 
 #include "eizo/eizo.h"
@@ -69,3 +72,45 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
         i += len;
     }
 }
+
+int
+eizo_dbg_poll(struct eizo_handle *handle)
+{
+    struct eizo_value_report r = {};
+
+    struct pollfd pfds[1];
+    pfds[0].fd = eizo_get_fd(handle);
+    pfds[0].events = POLLIN;
+    pfds[0].revents = 0;
+
+    int rc;
+    while (true) {
+        rc = poll(pfds, 1, -1);
+        if (rc <= 0) {
+            break;
+        }
+
+        if (pfds[0].revents & POLLIN) {
+            ssize_t n = read(pfds[0].fd, &r, sizeof(r));
+
+            if (n >= 7) {
+                enum eizo_usage usage = eizo_swap_usage(r.usage);
+                uint16_t counter = le16toh(r.counter);
+
+                printf("%u %08x %u ", r.report_id, usage, counter);
+
+                n -= 7;
+
+                for (ssize_t i = 0; i < n; ++i) {
+                    printf("%02x", r.value[i]);
+                }
+                printf("\n");
+            } else {
+                fprintf(stderr, "%s: read < 7\n", __func__);
+            }
+        }
+    }
+
+    return rc;
+}
+
