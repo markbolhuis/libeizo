@@ -441,6 +441,21 @@ enum eizo_profile_flags : uint16_t {
     EIZO_PROFILE_FLAGS_RESET               = 0x0800,
 };
 
+// Unknown values
+enum eizo_input_color_format : uint16_t {
+    EIZO_INPUT_COLOR_FORMAT_AUTO,
+    EIZO_INPUT_COLOR_FORMAT_YUV,
+    EIZO_INPUT_COLOR_FORMAT_YUV422,
+    EIZO_INPUT_COLOR_FORMAT_YUV444,
+    EIZO_INPUT_COLOR_FORMAT_RGB,
+};
+
+enum eizo_input_range : uint16_t {
+    EIZO_INPUT_RANGE_AUTO = 0,
+    EIZO_INPUT_RANGE_FULL = 1,
+    EIZO_INPUT_RANGE_LIMITED = 2,
+};
+
 enum eizo_display_port_version : uint16_t {
     EIZO_DISPLAY_PORT_VERSION_1_1 = 0,
     EIZO_DISPLAY_PORT_VERSION_1_2 = 1,
@@ -569,6 +584,11 @@ enum eizo_osd_language : uint16_t {
     EIZO_OSD_LANGUAGE_JAPANESE = 6,
     EIZO_OSD_LANGUAGE_CHINESE_SIMPLIFIED = 7,
     EIZO_OSD_LANGUAGE_CHINESE_TRADITIONAL = 8,
+};
+
+enum eizo_destination : uint16_t {
+    EIZO_DESTINATION_JAPAN = 0,
+    EIZO_DESTINATION_INTERNATIONAL = 1,
 };
 
 enum eizo_split_display_mode : uint16_t {
