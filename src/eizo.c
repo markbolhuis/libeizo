@@ -411,7 +411,7 @@ eizo_set_contrast(struct eizo_handle *handle, uint16_t value)
 }
 
 int
-eizo_get_usage_time(struct eizo_handle *handle, struct eizo_usage_time *usage)
+eizo_get_usage_time(struct eizo_handle *handle, long *time)
 {
     union {
         uint16_t hour;
@@ -419,20 +419,31 @@ eizo_get_usage_time(struct eizo_handle *handle, struct eizo_usage_time *usage)
     } u;
     int res = eizo_get_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
     if (res >= 0) {
-        usage->hour = le16toh(u.hour);
-        usage->minute = u.buf[2];
+        long t = (long)le16toh(u.hour);
+        t *= 60;
+        t += (long)u.buf[2];
+        *time = t;
     }
     return res;
 }
 
 int
-eizo_set_usage_time(struct eizo_handle *handle, struct eizo_usage_time usage)
+eizo_set_usage_time(struct eizo_handle *handle, long time)
 {
+    if (time < 0) {
+        errno = ERANGE;
+        return -1;
+    }
     union {
         uint16_t hour;
         uint8_t buf[3];
     } u;
-    u.hour = htole16(usage.hour);
-    u.buf[2] = usage.minute;
+    u.buf[2] = time % 60;
+    time /= 60;
+    if (time > UINT16_MAX) {
+        errno = ERANGE;
+        return -1;
+    }
+    u.hour = htole16(time);
     return eizo_set_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
 }

@@ -624,11 +624,6 @@ enum eizo_boot_logo : bool {
     EIZO_BOOT_LOGO_ENABLED = true,
 };
 
-struct eizo_usage_time {
-    uint16_t hour;
-    uint8_t  minute;
-};
-
 struct eizo_factory_panel_luminance {
     uint16_t white;
     uint16_t red;
@@ -695,8 +690,7 @@ int
 eizo_set_contrast(eizo_handle_t handle, uint16_t value);
 
 int
-eizo_get_usage_time(eizo_handle_t handle, struct eizo_usage_time *usage_time);
+eizo_get_usage_time(eizo_handle_t handle, long *time);
 
 int
-eizo_set_usage_time(eizo_handle_t handle, struct eizo_usage_time usage_time);
-
+eizo_set_usage_time(eizo_handle_t handle, long time);
