@@ -1,5 +1,7 @@
-#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
+#include <errno.h>
 
 #include <poll.h>
 #include <unistd.h>
@@ -9,6 +11,21 @@
 #include "eizo/eizo.h"
 #include "eizo/debug.h"
 #include "internal.h"
+
+static void
+eizo_print_hex(uint8_t *data, size_t size)
+{
+    printf("size %lu", size);
+    for (size_t i = 0; i < size; ++i) {
+        if (i % 16 == 0) {
+            printf("\n");
+        } else {
+            printf(" ");
+        }
+        printf("%02x", data[i]);
+    }
+    printf("\n");
+}
 
 void
 eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
@@ -21,18 +38,8 @@ eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
         return;
     }
 
-    printf("descriptor size: %d", n);
-
-    for (int i = 0; i < n; ++i) {
-        if (i % 16 == 0) {
-            printf("\n");
-        } else {
-            printf(" ");
-        }
-        printf("%02x", desc[i]);
-    }
-
-    printf("\n");
+    printf("secondary descriptor ");
+    eizo_print_hex(desc, (size_t)n);
 }
 
 void
@@ -71,6 +78,69 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
         printf("\n");
         i += len;
     }
+}
+
+void
+eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
+{
+    union {
+        struct {
+            uint16_t offset;
+            uint16_t size;
+        } __attribute__((packed));
+        uint8_t buf[64];
+    } u;
+
+    int rc = eizo_get_value(handle,
+                            EIZO_USAGE_EV_CUSTOM_KEY_LOCK_OFFSET_SIZE,
+                            u.buf, 4);
+    if (rc < 0) {
+        fprintf(stderr, "%s: Failed to get offset and size\n", __func__);
+        return;
+    }
+
+    long size   = le16toh(u.size);
+    long offset = le16toh(u.offset);
+
+    if (offset != 0) {
+        memset(u.buf, 0, 4);
+        rc = eizo_set_value(handle,
+                            EIZO_USAGE_EV_CUSTOM_KEY_LOCK_OFFSET_SIZE,
+                            u.buf, 4);
+        if (rc < 0) {
+            fprintf(stderr, "%s: Failed to reset offset.\n", __func__);
+            return;
+        }
+    }
+
+    uint8_t *data = malloc(size);
+    if (!data) {
+        fprintf(stderr, "%s: %s\n", __func__, strerror(errno));
+        return;
+    }
+
+    for (long i = 0; i < size; i += 62) {
+        rc = eizo_get_value(handle,
+                            EIZO_USAGE_EV_CUSTOM_KEY_LOCK_DATA,
+                            u.buf, 64);
+        if (rc < 0) {
+            fprintf(stderr, "%s: Failed to get data at %ld.\n", __func__, i);
+            goto end;
+        }
+
+        offset = le16toh(u.offset);
+        if (offset != i) {
+            fprintf(stderr, "%s: Offset %ld != %ld.\n", __func__, offset, i);
+            goto end;
+        }
+
+        memcpy(data + i, u.buf + 2, 62);
+    }
+
+    printf("custom key lock ");
+    eizo_print_hex(data, (size_t)size);
+end:
+    free(data);
 }
 
 int
@@ -113,4 +183,3 @@ eizo_dbg_poll(struct eizo_handle *handle)
 
     return rc;
 }
-
