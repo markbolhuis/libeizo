@@ -168,7 +168,7 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
     return 0;
 }
 
-static int
+int
 eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
     struct eizo_value_report r = {};
@@ -207,7 +207,7 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
     return rc;
 }
 
-static int
+int
 eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
     struct eizo_value_report r = {};

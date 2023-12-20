@@ -71,4 +71,10 @@ int
 eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst);
 
 int
+eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len);
+
+int
+eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len);
+
+int
 eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info);
