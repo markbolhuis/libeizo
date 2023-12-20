@@ -137,8 +137,42 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
         memcpy(data + i, u.buf + 2, 62);
     }
 
-    printf("custom key lock ");
-    eizo_print_hex(data, (size_t)size);
+    printf("custom key lock size: %ld\n", size);
+    long i = 0;
+    while (i < (size - 2)) {
+        uint32_t key = 0;
+        key |= data[i++] << 16;
+        key |= data[i++] << 8;
+        key |= data[i++];
+
+        printf("0x%06x", key);
+        if (i >= size) {
+            printf("\n");
+            break;
+        }
+
+        long len = data[i++];
+        printf(" %3ld", len);
+
+        if ((i + len) > size) {
+            len = size - i;
+        }
+
+        for (long j = i; j < (i + len); ++j) {
+            printf(" %02x", data[j]);
+        }
+
+        printf("\n");
+        i += len;
+    }
+    if (i < size) {
+        printf("Rem:");
+        for (long j = i; j < size; ++j) {
+            printf(" %02x", data[j]);
+        }
+        printf("\n");
+    }
+
 end:
     free(data);
 }
