@@ -178,6 +178,30 @@ end:
 }
 
 void
+eizo_dbg_dump_ff01010e(struct eizo_handle *handle)
+{
+    union {
+        uint32_t value;
+        uint8_t buf[512];
+    } u;
+
+    int rc = eizo_get_value(handle, 0xff01010d, u.buf, 4);
+    if (rc < 0) {
+        return;
+    }
+
+    printf("ff01010d: %08x\n", le32toh(u.value));
+
+    rc = eizo_get_value(handle, 0xff01010e, u.buf, 512);
+    if (rc < 0) {
+        return;
+    }
+
+    printf("ff01010e ");
+    eizo_print_hex(u.buf, 512);
+}
+
+void
 eizo_dbg_dump_edid(struct eizo_handle *handle)
 {
     uint8_t buf[256];

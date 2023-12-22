@@ -12,6 +12,9 @@ void
 eizo_dbg_dump_custom_key_lock(eizo_handle_t handle);
 
 void
+eizo_dbg_dump_ff01010e(eizo_handle_t handle);
+
+void
 eizo_dbg_dump_edid(eizo_handle_t handle);
 
 void
