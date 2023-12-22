@@ -178,6 +178,20 @@ end:
 }
 
 void
+eizo_dbg_dump_edid(struct eizo_handle *handle)
+{
+    uint8_t buf[256];
+
+    int rc = eizo_get_value(handle, EIZO_USAGE_EDID, buf, 256);
+    if (rc < 0) {
+        return;
+    }
+
+    printf("edid ");
+    eizo_print_hex(buf, 256);
+}
+
+void
 eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
 {
     uint8_t def[75];
