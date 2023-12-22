@@ -92,7 +92,7 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
     } u;
 
     int rc = eizo_get_value(handle,
-                            EIZO_USAGE_EV_CUSTOM_KEY_LOCK_OFFSET_SIZE,
+                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
                             u.buf, 4);
     if (rc < 0) {
         fprintf(stderr, "%s: Failed to get offset and size\n", __func__);
@@ -105,7 +105,7 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
     if (offset != 0) {
         memset(u.buf, 0, 4);
         rc = eizo_set_value(handle,
-                            EIZO_USAGE_EV_CUSTOM_KEY_LOCK_OFFSET_SIZE,
+                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
                             u.buf, 4);
         if (rc < 0) {
             fprintf(stderr, "%s: Failed to reset offset.\n", __func__);
@@ -121,7 +121,7 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
 
     for (long i = 0; i < size; i += 62) {
         rc = eizo_get_value(handle,
-                            EIZO_USAGE_EV_CUSTOM_KEY_LOCK_DATA,
+                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_DATA,
                             u.buf, 64);
         if (rc < 0) {
             fprintf(stderr, "%s: Failed to get data at %ld.\n", __func__, i);
