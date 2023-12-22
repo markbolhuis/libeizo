@@ -177,6 +177,39 @@ end:
     free(data);
 }
 
+void
+eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
+{
+    uint8_t def[75];
+
+    int rc = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_1, def, 1);
+    if (rc < 0) {
+        return;
+    }
+    printf("gain definition: %u\n", def[0]);
+
+    rc = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_2, def, 75);
+    if (rc < 0) {
+        return;
+    }
+
+    static const char *names[] = {
+        "NONE", "4000K", "4500K", "5000K", "5500K", "6000K", "6500K", "7000K",
+        "7500K", "8000K", "8500K", "9000K", "9300K", "9500K", "10000K",
+        "10500K", "11000K", "11500K", "12000K", "12500K", "13000K", "13500K",
+        "14000K", "14500K", "15000K",
+    };
+
+    for (int i = 0; i < 25; ++i) {
+        uint32_t color = 0;
+        color |= def[i * 3] << 16;
+        color |= def[i * 3 + 1] << 8;
+        color |= def[i * 3 + 2];
+
+        printf("%-7s#%06x\n", names[i], color);
+    }
+}
+
 int
 eizo_dbg_poll(struct eizo_handle *handle)
 {
