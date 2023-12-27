@@ -102,6 +102,11 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
     long size   = le16toh(u.size);
     long offset = le16toh(u.offset);
 
+    if (size == 0) {
+        fprintf(stderr, "%s: Custom key lock size is 0.\n", __func__);
+        return;
+    }
+
     if (offset != 0) {
         memset(u.buf, 0, 4);
         rc = eizo_set_value(handle,
