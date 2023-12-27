@@ -5,6 +5,7 @@
 
 #include <poll.h>
 #include <unistd.h>
+#include <sys/param.h>
 
 #include <linux/hid.h>
 
@@ -139,7 +140,8 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
             goto end;
         }
 
-        memcpy(data + i, u.buf + 2, 62);
+        long cpy = MIN(size - i, 62);
+        memcpy(data + i, u.buf + 2, cpy);
     }
 
     printf("custom key lock size: %ld\n", size);
