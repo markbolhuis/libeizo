@@ -346,6 +346,7 @@ enum eizo_auto_input : bool {
 };
 
 enum eizo_input_port : uint16_t {
+    EIZO_INPUT_PORT_UNDEFINED  = 0x0000,
     EIZO_INPUT_PORT_DSUB1      = 0x0100,
     EIZO_INPUT_PORT_DSUB2      = 0x0101,
     EIZO_INPUT_PORT_DVI1       = 0x0200,
