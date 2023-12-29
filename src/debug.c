@@ -82,7 +82,7 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 }
 
 void
-eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
+eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
 {
     union {
         struct {
@@ -144,7 +144,7 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
         memcpy(data + i, u.buf + 2, cpy);
     }
 
-    printf("custom key lock size: %ld\n", size);
+    printf("available custom key lock size: %ld\n", size);
     long i = 0;
     while (i < (size - 2)) {
         uint32_t key = 0;
