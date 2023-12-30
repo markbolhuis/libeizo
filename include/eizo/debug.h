@@ -21,4 +21,4 @@ void
 eizo_dbg_dump_gain_definition(eizo_handle_t handle);
 
 int
-eizo_dbg_poll(struct eizo_handle *handle);
+eizo_dbg_poll(eizo_handle_t handle);
