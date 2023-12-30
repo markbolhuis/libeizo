@@ -488,3 +488,6 @@ eizo_get_usage_time(eizo_handle_t handle, long *time);
 
 int
 eizo_set_usage_time(eizo_handle_t handle, long time);
+
+long
+eizo_get_available_custom_key_lock(eizo_handle_t handle, uint8_t **ptr);

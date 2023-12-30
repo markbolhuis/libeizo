@@ -84,64 +84,10 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 void
 eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
 {
-    union {
-        struct {
-            uint16_t offset;
-            uint16_t size;
-        } __attribute__((packed));
-        uint8_t buf[64];
-    } u;
-
-    int rc = eizo_get_value(handle,
-                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
-                            u.buf, 4);
-    if (rc < 0) {
-        fprintf(stderr, "%s: Failed to get offset and size\n", __func__);
+    uint8_t *data = nullptr;
+    long size = eizo_get_available_custom_key_lock(handle, &data);
+    if (size < 0) {
         return;
-    }
-
-    long size   = le16toh(u.size);
-    long offset = le16toh(u.offset);
-
-    if (size == 0) {
-        fprintf(stderr, "%s: Custom key lock size is 0.\n", __func__);
-        return;
-    }
-
-    if (offset != 0) {
-        memset(u.buf, 0, 4);
-        rc = eizo_set_value(handle,
-                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
-                            u.buf, 4);
-        if (rc < 0) {
-            fprintf(stderr, "%s: Failed to reset offset.\n", __func__);
-            return;
-        }
-    }
-
-    uint8_t *data = malloc(size);
-    if (!data) {
-        fprintf(stderr, "%s: %s\n", __func__, strerror(errno));
-        return;
-    }
-
-    for (long i = 0; i < size; i += 62) {
-        rc = eizo_get_value(handle,
-                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_DATA,
-                            u.buf, 64);
-        if (rc < 0) {
-            fprintf(stderr, "%s: Failed to get data at %ld.\n", __func__, i);
-            goto end;
-        }
-
-        offset = le16toh(u.offset);
-        if (offset != i) {
-            fprintf(stderr, "%s: Offset %ld != %ld.\n", __func__, offset, i);
-            goto end;
-        }
-
-        long cpy = MIN(size - i, 62);
-        memcpy(data + i, u.buf + 2, cpy);
     }
 
     printf("available custom key lock size: %ld\n", size);
@@ -180,7 +126,6 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
         printf("\n");
     }
 
-end:
     free(data);
 }
 
