@@ -168,6 +168,26 @@ eizo_dbg_dump_edid(struct eizo_handle *handle)
 }
 
 void
+eizo_dbg_dump_ff020059(struct eizo_handle *handle)
+{
+    union {
+        uint8_t u8[512];
+        uint16_t u16[256];
+    } u;
+
+    int rc = eizo_get_value(handle, 0xff020059, u.u8, 512);
+    if (rc < 0) {
+        fprintf(stderr, "%s: eizo_get_value failed\n", __func__);
+        return;
+    }
+
+    printf("ff020059\n");
+    for (int i = 0; i < 256; ++i) {
+        printf("%d: %u\n", i, le16toh(u.u16[i]));
+    }
+}
+
+void
 eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
 {
     uint8_t def[75];
