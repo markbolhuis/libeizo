@@ -40,6 +40,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_COLOR_TEMPERATURE            = 0xff000007,
     EIZO_USAGE_OSD_INDICATOR                = 0xff00000f,
     EIZO_USAGE_PROFILE                      = 0xff000015,
+    EIZO_USAGE_EEP_ADDRESS                  = 0xff000030,
     EIZO_USAGE_EEP_DATA                     = 0xff000031,
     EIZO_USAGE_USAGE_TIME                   = 0xff000037,
     EIZO_USAGE_USAGE_TIME2                  = 0xff000047,
