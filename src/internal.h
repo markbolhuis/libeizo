@@ -180,7 +180,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_BACKLIGHT_REPLACE_INFO_1     = 0xff02002e,
     EIZO_USAGE_EDID                         = 0xff020034,
     EIZO_USAGE_SERIAL_STRING                = 0xff020036,
-    EIZO_USAGE_EDIDDDC_WRITE                = 0xff020037,
+    EIZO_USAGE_EDID_DDC_WRITE               = 0xff020037,
     EIZO_USAGE_BACKLIGHT_REPLACE_INFO_2     = 0xff02003f,
     EIZO_USAGE_AGING_MODE                   = 0xff020044,
     EIZO_USAGE_GAMMA_TC_STATUS              = 0xff020047,
