@@ -4,6 +4,18 @@
 
 typedef struct eizo_handle *eizo_handle_t;
 
+enum eizo_result : int {
+    EIZO_SUCCESS = 0,
+    EIZO_INCOMPLETE = 1,
+    EIZO_ERROR_UNKNOWN = -1,
+    EIZO_ERROR_IO = -2,
+    EIZO_ERROR_INVALID_ARGUMENT = -3,
+    EIZO_ERROR_NO_MEMORY = -4,
+    EIZO_ERROR_RACE_CONDITION = -5,
+    EIZO_ERROR_INVALID_USAGE = -6,
+    EIZO_ERROR_NOT_PERMITTED = -7,
+};
+
 enum : uint16_t {
     EIZO_VID = 0x056d,
 };
@@ -453,8 +465,8 @@ struct eizo_6axis_colors {
     uint32_t yellow;
 };
 
-eizo_handle_t
-eizo_open_hidraw(const char *path);
+enum eizo_result
+eizo_open_hidraw(const char *path, eizo_handle_t *handle);
 
 void 
 eizo_close(eizo_handle_t handle);
@@ -471,23 +483,26 @@ eizo_get_serial(eizo_handle_t handle);
 const char *
 eizo_get_model(eizo_handle_t handle);
 
-int
+enum eizo_result
 eizo_get_brightness(eizo_handle_t handle, uint16_t *value);
 
-int
+enum eizo_result
 eizo_set_brightness(eizo_handle_t handle, uint16_t value);
 
-int
+enum eizo_result
 eizo_get_contrast(eizo_handle_t handle, uint16_t *value);
 
-int
+enum eizo_result
 eizo_set_contrast(eizo_handle_t handle, uint16_t value);
 
-int
+enum eizo_result
 eizo_get_usage_time(eizo_handle_t handle, long *time);
 
-int
+enum eizo_result
 eizo_set_usage_time(eizo_handle_t handle, long time);
 
-long
-eizo_get_available_custom_key_lock(eizo_handle_t handle, uint8_t **ptr);
+enum eizo_result
+eizo_get_available_custom_key_lock(
+    eizo_handle_t handle,
+    uint8_t **ptr,
+    size_t *len);

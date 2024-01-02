@@ -32,24 +32,24 @@ void
 eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
 {
     uint8_t desc[HID_MAX_DESCRIPTOR_SIZE];
-
-    int n = eizo_get_secondary_descriptor(handle, desc);
-    if (n < 0) {
+    int size = -1;
+    enum eizo_result res = eizo_get_secondary_descriptor(handle, desc, &size);
+    if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: reading the descriptor failed.\n", __func__);
         return;
     }
 
     printf("secondary descriptor ");
-    eizo_print_hex(desc, (size_t)n);
+    eizo_print_hex(desc, (size_t)size);
 }
 
 void
 eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 {
     uint8_t info[EIZO_FF300009_MAX_SIZE];
-
-    int size = eizo_get_ff300009(handle, info);
-    if (size < 0) {
+    int size = -1;
+    enum eizo_result res = eizo_get_ff300009(handle, info, &size);
+    if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: reading ff300009 info failed.\n", __func__);
         return;
     }
@@ -85,13 +85,16 @@ void
 eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
 {
     uint8_t *data = nullptr;
-    long size = eizo_get_available_custom_key_lock(handle, &data);
-    if (size < 0) {
+    size_t size = 0;
+
+    enum eizo_result res = eizo_get_available_custom_key_lock(
+        handle, &data, &size);
+    if (res < EIZO_SUCCESS) {
         return;
     }
 
     printf("available custom key lock size: %ld\n", size);
-    long i = 0;
+    size_t i = 0;
     while (i < (size - 2)) {
         uint32_t key = 0;
         key |= data[i++] << 16;
@@ -104,14 +107,14 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
             break;
         }
 
-        long len = data[i++];
+        size_t len = data[i++];
         printf(" %3ld", len);
 
         if ((i + len) > size) {
             len = size - i;
         }
 
-        for (long j = i; j < (i + len); ++j) {
+        for (size_t j = i; j < (i + len); ++j) {
             printf(" %02x", data[j]);
         }
 
@@ -120,7 +123,7 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
     }
     if (i < size) {
         printf("Rem:");
-        for (long j = i; j < size; ++j) {
+        for (size_t j = i; j < size; ++j) {
             printf(" %02x", data[j]);
         }
         printf("\n");
@@ -137,15 +140,15 @@ eizo_dbg_dump_ff01010e(struct eizo_handle *handle)
         uint8_t buf[512];
     } u;
 
-    int rc = eizo_get_value(handle, 0xff01010d, u.buf, 4);
-    if (rc < 0) {
+    enum eizo_result res = eizo_get_value(handle, 0xff01010d, u.buf, 4);
+    if (res < EIZO_SUCCESS) {
         return;
     }
 
     printf("ff01010d: %08x\n", le32toh(u.value));
 
-    rc = eizo_get_value(handle, 0xff01010e, u.buf, 512);
-    if (rc < 0) {
+    res = eizo_get_value(handle, 0xff01010e, u.buf, 512);
+    if (res < EIZO_SUCCESS) {
         return;
     }
 
@@ -158,8 +161,8 @@ eizo_dbg_dump_edid(struct eizo_handle *handle)
 {
     uint8_t buf[256];
 
-    int rc = eizo_get_value(handle, EIZO_USAGE_EDID, buf, 256);
-    if (rc < 0) {
+    enum eizo_result res = eizo_get_value(handle, EIZO_USAGE_EDID, buf, 256);
+    if (res < EIZO_SUCCESS) {
         return;
     }
 
@@ -175,8 +178,8 @@ eizo_dbg_dump_ff020059(struct eizo_handle *handle)
         uint16_t u16[256];
     } u;
 
-    int rc = eizo_get_value(handle, 0xff020059, u.u8, 512);
-    if (rc < 0) {
+    enum eizo_result res = eizo_get_value(handle, 0xff020059, u.u8, 512);
+    if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: eizo_get_value failed\n", __func__);
         return;
     }
@@ -192,14 +195,14 @@ eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
 {
     uint8_t def[75];
 
-    int rc = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_1, def, 1);
-    if (rc < 0) {
+    enum eizo_result res = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_1, def, 1);
+    if (res < EIZO_SUCCESS) {
         return;
     }
     printf("gain definition: %u\n", def[0]);
 
-    rc = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_2, def, 75);
-    if (rc < 0) {
+    res = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_2, def, 75);
+    if (res < EIZO_SUCCESS) {
         return;
     }
 

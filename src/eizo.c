@@ -23,7 +23,7 @@ struct eizo_handle {
 };
 
 [[maybe_unused]]
-static int
+static enum eizo_result
 eizo_get_counter(struct eizo_handle *handle, uint16_t *counter) 
 {
     struct eizo_counter_report r = {};
@@ -31,16 +31,15 @@ eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
 
     int res = ioctl(handle->fd, HIDIOCGFEATURE(3), &r);
     if (res < 0) {
-        fprintf(stderr, "HIDIOCGFEATURE\n");
-        return -1;
+        return EIZO_ERROR_IO;
     }
 
     *counter = le16toh(r.counter);
-    return 0;
+    return EIZO_SUCCESS;
 }
 
 [[maybe_unused]]
-static int
+static enum eizo_result
 eizo_get_serial_model(
     struct eizo_handle *handle,
     unsigned long *serial,
@@ -51,8 +50,7 @@ eizo_get_serial_model(
 
     int res = ioctl(handle->fd, HIDIOCGFEATURE(25), buf);
     if (res < 0) {
-        perror("HIDIOCGFEATURE");
-        return -1;
+        return EIZO_ERROR_IO;
     }
 
     int i;
@@ -75,28 +73,29 @@ eizo_get_serial_model(
                 __func__);
     }
 
-    return 0;
+    return EIZO_SUCCESS;
 }
 
 [[maybe_unused]]
-int
-eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst)
+enum eizo_result
+eizo_get_secondary_descriptor(
+    struct eizo_handle *handle,
+    uint8_t *dst,
+    int *size)
 {
     struct eizo_descriptor_report r = {};
     r.report_id = EIZO_REPORT_ID_DESCRIPTOR;
 
     int rc = ioctl(handle->fd, HIDIOCSFEATURE(517), &r);
     if (rc < 0) {
-        perror("HIDIOCSFEATURE");
-        return -1;
+        return EIZO_ERROR_IO;
     }
 
     uint16_t desc_len = 0, pos = 0;
     do {
         rc = ioctl(handle->fd, HIDIOCGFEATURE(517), &r);
         if (rc < 0) {
-            perror("HIDIOCGFEATURE");
-            return -1;
+            return EIZO_ERROR_IO;
         }
 
         uint16_t offset = le16toh(r.offset);
@@ -104,18 +103,18 @@ eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst)
 
         if (offset != pos) {
             fprintf(stderr, "%s: Invalid offset %u != %u.\n", __func__, offset, pos);
-            return -1;
+            return EIZO_ERROR_UNKNOWN;
         }
 
         if (desc_len == 0) {
             if (len > HID_MAX_DESCRIPTOR_SIZE || len == 0) {
                 fprintf(stderr, "%s: Invalid descriptor size %u.\n", __func__, len);
-                return -1;
+                return EIZO_ERROR_UNKNOWN;
             }
             desc_len = len;
         } else if (desc_len != len) {
             fprintf(stderr, "%s: Invalid length %u at position %u.\n", __func__, len, pos);
-            return -1;
+            return EIZO_ERROR_UNKNOWN;
         }
 
         uint16_t cpy = MIN(desc_len - pos, 512);
@@ -124,10 +123,11 @@ eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst)
         pos += 512;
     } while (pos < desc_len);
 
-    return (int)desc_len;
+    *size = (int)desc_len;
+    return EIZO_SUCCESS;
 }
 
-static int
+static enum eizo_result
 eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 {
     struct eizo_verify_report r = {};
@@ -135,41 +135,30 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 
     int rc = ioctl(handle->fd, HIDIOCGFEATURE(8), &r);
     if (rc < 0) {
-        perror("HIDIOCGFEATURE");
-        return rc;
+        return EIZO_ERROR_IO;
     }
 
-    uint16_t last_counter = le16toh(r.counter);
-    if (last_counter != handle->counter) {
-        // Another handle is communicating with the monitor,
-        // causing a race condition.
-        fprintf(stderr, "%s: unknown handle counter: %u != %u\n",
-                __func__, handle->counter, last_counter);
-        return -1;
+    if (le16toh(r.counter) != handle->counter) {
+        return EIZO_ERROR_RACE_CONDITION;
     }
 
-    enum eizo_usage last_usage = eizo_swap_usage(r.usage);
-    if (last_usage != usage) {
-        // The process using this handle is reading or writing
-        // then verifying out of order.
-        fprintf(stderr, "%s: unknown last usage: %08x != %08x\n",
-                __func__, usage, last_usage);
-        return -1;
+    if (eizo_swap_usage(r.usage) != usage) {
+        return EIZO_ERROR_INVALID_USAGE;
     }
 
     if (r.result != 0) {
-        // The monitor explicitly rejected the request, usually 
-        // because the value was invalid, out of range etc...
-        fprintf(stderr, "%s: failed to apply request.\n", __func__);
-        errno = EINVAL;
-        return -1;
+        return EIZO_ERROR_NOT_PERMITTED;
     }
 
-    return 0;
+    return EIZO_SUCCESS;
 }
 
-int
-eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
+enum eizo_result
+eizo_get_value(
+    struct eizo_handle *handle,
+    enum eizo_usage usage,
+    uint8_t *value,
+    size_t len)
 {
     struct eizo_value_report r = {};
     unsigned long cap;
@@ -181,8 +170,7 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
         r.report_id = EIZO_REPORT_ID_GET_V2;
         cap = 519;
     } else {
-        errno = EINVAL;
-        return -1;
+        return EIZO_ERROR_INVALID_ARGUMENT;
     }
 
     r.usage = eizo_swap_usage(usage);
@@ -190,25 +178,27 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 
     int rc = ioctl(handle->fd, HIDIOCSFEATURE(cap), &r);
     if (rc < 0) {
-        perror("HIDIOCSFEATURE");
-        return rc;
+        return EIZO_ERROR_IO;
     }
 
     rc = ioctl(handle->fd, HIDIOCGFEATURE(cap), &r);
     if (rc < 0) {
-        perror("HIDIOCGFEATURE");
-        return rc;
+        return EIZO_ERROR_IO;
     }
 
-    rc = eizo_verify(handle, usage);
-    if (rc >= 0) {
+    enum eizo_result res = eizo_verify(handle, usage);
+    if (res >= EIZO_SUCCESS) {
         memcpy(value, r.value, len);
     }
-    return rc;
+    return res;
 }
 
-int
-eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
+enum eizo_result
+eizo_set_value(
+    struct eizo_handle *handle,
+    enum eizo_usage usage,
+    uint8_t *value,
+    size_t len)
 {
     struct eizo_value_report r = {};
     unsigned long cap;
@@ -220,8 +210,7 @@ eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
         r.report_id = EIZO_REPORT_ID_SET_V2;
         cap = 519;
     } else {
-        errno = EINVAL;
-        return -1;
+        return EIZO_ERROR_INVALID_ARGUMENT;
     }
 
     r.usage = eizo_swap_usage(usage);
@@ -230,104 +219,103 @@ eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 
     int rc = ioctl(handle->fd, HIDIOCSFEATURE(cap), &r);
     if (rc < 0) {
-        perror("HIDIOCSFEATURE");
-        return rc;
+        return EIZO_ERROR_IO;
     }
 
     return eizo_verify(handle, usage);
 }
 
-int
-eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info)
+enum eizo_result
+eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info, int *size)
 {
     uint8_t buf[EIZO_FF300009_MAX_SIZE + 1];
     buf[0] = EIZO_REPORT_ID_INFO;
 
-    int size = ioctl(handle->fd, HIDIOCGFEATURE(sizeof(buf)), buf);
-    if (size < 0) {
-        perror("HIDIOCGFEATURE");
-        return -1;
+    int s = ioctl(handle->fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+    if (s < 0) {
+        return EIZO_ERROR_IO;
     }
 
-    if (size > 1) {
-        memcpy(info, buf + 1, size - 1);
+    if (s > 1) {
+        memcpy(info, buf + 1, s - 1);
     }
-
-    return size == 0 ? 0 : size - 1;
+    *size = s == 0 ? 0 : s - 1;
+    return EIZO_SUCCESS;
 }
 
 
-static int
+static enum eizo_result
 eizo_get_hidraw_descriptor(struct eizo_handle *handle)
 {
     int size = -1;
 
     int res = ioctl(handle->fd, HIDIOCGRDESCSIZE, &size);
     if (res < 0 || size < 0) {
-        perror("HIDIOCGRDESCSIZE");
-        return -1;
+        return EIZO_ERROR_IO;
     }
 
     handle->descriptor.size = size;
     res = ioctl(handle->fd, HIDIOCGRDESC, &handle->descriptor);
     if (res < 0) {
-        perror("HIDIOCGRDESC");
-        return -1;
+        return EIZO_ERROR_IO;
     }
 
-    return 0;
+    return EIZO_SUCCESS;
 }
 
-static int
+static enum eizo_result
 eizo_get_hidraw_devinfo(struct eizo_handle *handle)
 {
     struct hidraw_devinfo devinfo = {};
 
     int res = ioctl(handle->fd, HIDIOCGRAWINFO, &devinfo);
     if (res < 0) {
-        perror("HIDIOCGRAWINFO");
-        return -1;
+        return EIZO_ERROR_IO;
     }
 
     handle->pid = devinfo.product;
-    return 0;
+    return EIZO_SUCCESS;
 }
 
-struct eizo_handle *
-eizo_open_hidraw(const char *path)
+enum eizo_result
+eizo_open_hidraw(const char *path, struct eizo_handle **handle)
 {
     struct eizo_handle *h = calloc(1, sizeof *h);
     if (!h) {
-        perror("calloc");
-        return nullptr;
+        return EIZO_ERROR_NO_MEMORY;
     }
+
+    enum eizo_result res;
 
     h->fd = open(path, O_RDWR | O_CLOEXEC);
     if (h->fd < 0) {
         fprintf(stderr, "%s: Failed to open %s. %s\n", __func__, path, strerror(errno));
+        res = EIZO_ERROR_IO;
         goto err_open;
     }
 
-    int res = eizo_get_hidraw_descriptor(h);
-    if (res < 0) {
+    res = eizo_get_hidraw_descriptor(h);
+    if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: Failed to read hidraw descriptor.\n", __func__);
         goto err_hidraw;
     }
 
     res = eizo_get_hidraw_devinfo(h);
-    if (res < 0) {
+    if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: Failed to read hidraw devinfo.\n", __func__);
         goto err_hidraw;
     }
 
     eizo_get_counter(h, &h->counter);
     eizo_get_serial_model(h, &h->serial, h->model);
-    return h;
+    *handle = h;
+    return EIZO_SUCCESS;
+
 err_hidraw:
     close(h->fd);
 err_open:
     free(h);
-    return nullptr;
+    return res;
 }
 
 void 
@@ -361,21 +349,21 @@ eizo_get_model(struct eizo_handle *handle)
     return handle->model;
 }
 
-static int
+static enum eizo_result
 eizo_get_uint16(struct eizo_handle *handle, enum eizo_usage usage, uint16_t *value)
 {
     union {
         uint16_t value;
         uint8_t buf[2];
     } u;
-    int res = eizo_get_value(handle, usage, u.buf, 2);
-    if (res >= 0) {
+    enum eizo_result res = eizo_get_value(handle, usage, u.buf, 2);
+    if (res >= EIZO_SUCCESS) {
         *value = le16toh(u.value);
     }
     return res;
 }
 
-static int
+static enum eizo_result
 eizo_set_uint16(struct eizo_handle *handle, enum eizo_usage usage, uint16_t value)
 {
     union {
@@ -386,39 +374,42 @@ eizo_set_uint16(struct eizo_handle *handle, enum eizo_usage usage, uint16_t valu
     return eizo_set_value(handle, usage, u.buf, 2);
 }
 
-int
+enum eizo_result
 eizo_get_brightness(struct eizo_handle *handle, uint16_t *value)
 {
     return eizo_get_uint16(handle, EIZO_USAGE_BRIGHTNESS, value);
 }
 
-int
+enum eizo_result
 eizo_set_brightness(struct eizo_handle *handle, uint16_t value)
 {
     return eizo_set_uint16(handle, EIZO_USAGE_BRIGHTNESS, value);
 }
 
-int
+enum eizo_result
 eizo_get_contrast(struct eizo_handle *handle, uint16_t *value)
 {
     return eizo_get_uint16(handle, EIZO_USAGE_CONTRAST, value);
 }
 
-int
+enum eizo_result
 eizo_set_contrast(struct eizo_handle *handle, uint16_t value)
 {
     return eizo_set_uint16(handle, EIZO_USAGE_CONTRAST, value);
 }
 
-int
+enum eizo_result
 eizo_get_usage_time(struct eizo_handle *handle, long *time)
 {
     union {
         uint16_t hour;
         uint8_t buf[3];
     } u;
-    int res = eizo_get_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
-    if (res >= 0) {
+    enum eizo_result res = eizo_get_value(
+        handle,
+        EIZO_USAGE_USAGE_TIME,
+        u.buf, 3);
+    if (res >= EIZO_SUCCESS) {
         long t = (long)le16toh(u.hour);
         t *= 60;
         t += (long)u.buf[2];
@@ -427,12 +418,11 @@ eizo_get_usage_time(struct eizo_handle *handle, long *time)
     return res;
 }
 
-int
+enum eizo_result
 eizo_set_usage_time(struct eizo_handle *handle, long time)
 {
     if (time < 0) {
-        errno = ERANGE;
-        return -1;
+        return EIZO_ERROR_INVALID_ARGUMENT;
     }
     union {
         uint16_t hour;
@@ -441,15 +431,17 @@ eizo_set_usage_time(struct eizo_handle *handle, long time)
     u.buf[2] = time % 60;
     time /= 60;
     if (time > UINT16_MAX) {
-        errno = ERANGE;
-        return -1;
+        return EIZO_ERROR_INVALID_ARGUMENT;
     }
     u.hour = htole16(time);
     return eizo_set_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
 }
 
-long
-eizo_get_available_custom_key_lock(struct eizo_handle *handle, uint8_t **ptr)
+enum eizo_result
+eizo_get_available_custom_key_lock(
+    struct eizo_handle *handle,
+    uint8_t **ptr,
+    size_t *len)
 {
     union {
         struct {
@@ -459,42 +451,47 @@ eizo_get_available_custom_key_lock(struct eizo_handle *handle, uint8_t **ptr)
         uint8_t buf[64];
     } u;
 
-    int rc = eizo_get_value(handle,
-                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
-                            u.buf, 4);
-    if (rc < 0) {
+    enum eizo_result res = eizo_get_value(
+        handle,
+        EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
+        u.buf, 4);
+    if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: Failed to get offset and size\n", __func__);
-        return -1;
+        return res;
     }
 
-    long size = le16toh(u.size);
+    size_t size = le16toh(u.size);
     if (size == 0) {
-        return 0;
+        *len = 0;
+        *ptr = nullptr;
+        return EIZO_SUCCESS;
     }
 
-    long offset = le16toh(u.offset);
+    size_t offset = le16toh(u.offset);
     if (offset != 0) {
         memset(u.buf, 0, 4);
-        rc = eizo_set_value(handle,
-                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
-                            u.buf, 4);
-        if (rc < 0) {
+        res = eizo_set_value(
+            handle,
+            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_OFFSET_SIZE,
+            u.buf, 4);
+        if (res < EIZO_SUCCESS) {
             fprintf(stderr, "%s: Failed to reset offset.\n", __func__);
-            return -1;
+            return res;
         }
     }
 
     uint8_t *data = malloc(size);
     if (!data) {
         fprintf(stderr, "%s: %s\n", __func__, strerror(errno));
-        return -1;
+        return EIZO_ERROR_NO_MEMORY;
     }
 
-    for (long i = 0; i < size; i += 62) {
-        rc = eizo_get_value(handle,
-                            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_DATA,
-                            u.buf, 64);
-        if (rc < 0) {
+    for (size_t i = 0; i < size; i += 62) {
+        res = eizo_get_value(
+            handle,
+            EIZO_USAGE_EV_AVAILABLE_CUSTOM_KEY_LOCK_DATA,
+            u.buf, 64);
+        if (res < EIZO_SUCCESS) {
             fprintf(stderr, "%s: Failed to get data at %ld.\n", __func__, i);
             goto end;
         }
@@ -502,16 +499,18 @@ eizo_get_available_custom_key_lock(struct eizo_handle *handle, uint8_t **ptr)
         offset = le16toh(u.offset);
         if (offset != i) {
             fprintf(stderr, "%s: Offset %ld != %ld.\n", __func__, offset, i);
+            res = EIZO_ERROR_UNKNOWN;
             goto end;
         }
 
-        long cpy = MIN(size - i, 62);
+        size_t cpy = MIN(size - i, 62);
         memcpy(data + i, u.buf + 2, cpy);
     }
 
     *ptr = data;
-    return size;
+    *len = size;
+    return EIZO_SUCCESS;
 end:
     free(data);
-    return -1;
+    return res;
 }

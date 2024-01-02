@@ -12,8 +12,9 @@ main(int argc, const char *argv[])
         return EXIT_FAILURE;
     }
 
-    eizo_handle_t handle = eizo_open_hidraw(argv[1]);
-    if (!handle) {
+    eizo_handle_t handle = nullptr;
+    enum eizo_result res = eizo_open_hidraw(argv[1], &handle);
+    if (res < EIZO_SUCCESS || handle == nullptr) {
         return EXIT_FAILURE;
     }
 
