@@ -258,6 +258,12 @@ enum eizo_usage : uint32_t {
     // EIZO_USAGE_6AXIS_YELLOW
 };
 
+// These values are only tested on the ev2760
+enum eizo_eep_address : uint16_t {
+    EIZO_EEP_ADDRESS_BOOT_LOGO    = 0x00bb,
+    EIZO_EEP_ADDRESS_OSD_LANGUAGE = 0x011f,
+};
+
 struct __attribute__((packed)) eizo_descriptor_report {
     uint8_t  report_id;
     uint16_t offset;
