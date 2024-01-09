@@ -264,7 +264,7 @@ enum eizo_eep_address : uint16_t {
     EIZO_EEP_ADDRESS_OSD_LANGUAGE = 0x011f,
 };
 
-struct __attribute__((packed)) eizo_descriptor_report {
+struct [[gnu::packed]] eizo_descriptor_report {
     uint8_t  report_id;
     uint16_t offset;
     uint16_t length;
@@ -272,7 +272,7 @@ struct __attribute__((packed)) eizo_descriptor_report {
 };
 static_assert(sizeof(struct eizo_descriptor_report) == 517);
 
-struct __attribute__((packed)) eizo_value_report {
+struct [[gnu::packed]] eizo_value_report {
     uint8_t  report_id;
     uint32_t usage;
     uint16_t counter;
@@ -280,13 +280,13 @@ struct __attribute__((packed)) eizo_value_report {
 };
 static_assert(sizeof(struct eizo_value_report) == 519);
 
-struct __attribute__((packed)) eizo_counter_report {
+struct [[gnu::packed]] eizo_counter_report {
     uint8_t  report_id;
     uint16_t counter;
 };
 static_assert(sizeof(struct eizo_counter_report) == 3);
 
-struct __attribute__((packed)) eizo_verify_report {
+struct [[gnu::packed]] eizo_verify_report {
     uint8_t  report_id;
     uint32_t usage;
     uint16_t counter;

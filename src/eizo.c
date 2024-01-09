@@ -447,7 +447,7 @@ eizo_get_available_custom_key_lock(
         struct {
             uint16_t offset;
             uint16_t size;
-        } __attribute__((packed));
+        };
         uint8_t buf[64];
     } u;
 
