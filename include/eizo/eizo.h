@@ -430,6 +430,16 @@ enum eizo_boot_logo : bool {
     EIZO_BOOT_LOGO_ENABLED = true,
 };
 
+enum eizo_test_picture : uint16_t {
+    EIZO_TEST_PICTURE_WHITE_FULL_SCREEN = 2,
+    EIZO_TEST_PICTURE_WHITE_BLACK_BORDER = 6,
+    EIZO_TEST_PICTURE_RED_GRADIENT = 9,
+    EIZO_TEST_PICTURE_GREEN_GRADIENT = 10,
+    EIZO_TEST_PICTURE_BLUE_GRADIENT = 11,
+    EIZO_TEST_PICTURE_WHITE_GRADIENT = 12,
+    EIZO_TEST_PICTURE_BLACK_SQUARE = 19,
+};
+
 struct eizo_factory_panel_luminance {
     uint16_t white;
     uint16_t red;
