@@ -266,6 +266,7 @@ enum eizo_eep_address : uint16_t {
     EIZO_EEP_ADDRESS_BOOT_LOGO          = 0x00bb,
     EIZO_EEP_ADDRESS_OSD_MENU_LOCK      = 0x00bc,
     EIZO_EEP_ADDRESS_OSD_KEY_LOCK       = 0x00bd,
+    EIZO_EEP_ADDRESS_AUTO_ECOVIEW       = 0x00c0,
     EIZO_EEP_ADDRESS_ECOVIEW_OPT2       = 0x00c1,
     EIZO_EEP_ADDRESS_VOLUME             = 0x00c2,
     EIZO_EEP_ADDRESS_SOUND_SOURCE       = 0x00c6,
