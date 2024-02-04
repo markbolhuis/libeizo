@@ -288,6 +288,12 @@ enum eizo_eep_address : uint16_t {
     EIZO_EEP_ADDRESS_INPUT_COLOR_FORMAT = 0x0124,
     EIZO_EEP_ADDRESS_INPUT_RANGE        = 0x0125,
     EIZO_EEP_ADDRESS_OSD_ROTATION       = 0x0126,
+
+    // There is an eep address that is used to enable or
+    // disable the OSD input indicator that shows up when
+    // switching input sources. The address value is not
+    // know, however.
+    // EIZO_EEP_ADDRESS_OSD_INPUT_INDICATOR,
 };
 
 struct [[gnu::packed]] eizo_descriptor_report {
