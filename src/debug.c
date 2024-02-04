@@ -82,6 +82,43 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 }
 
 void
+eizo_dbg_dump_eep_data(struct eizo_handle *handle)
+{
+#define EEP_SIZE 512
+    uint8_t buf[EEP_SIZE];
+
+    union {
+        uint16_t value;
+        uint8_t buf[2];
+    } u;
+
+    for (uint16_t i = 0; i < EEP_SIZE; ++i) {
+        u.value = htole16(i);
+        enum eizo_result res = eizo_set_value(
+            handle,
+            EIZO_USAGE_EEP_ADDRESS,
+            u.buf, 2);
+        if (res < EIZO_SUCCESS) {
+            fprintf(stderr, "%s: Failed to set eep address %u.\n",
+                    __func__, i);
+            return;
+        }
+
+        res = eizo_get_value(handle, EIZO_USAGE_EEP_DATA, u.buf, 2);
+        if (res < EIZO_SUCCESS) {
+            fprintf(stderr, "%s: Failed to get eep data at address %u.\n",
+                    __func__, i);
+            return;
+        }
+        buf[i] = (uint8_t)le16toh(u.value);
+    }
+
+    printf("eep data ");
+    eizo_print_hex(buf, EEP_SIZE);
+#undef EEP_SIZE
+}
+
+void
 eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
 {
     uint8_t *data = nullptr;
