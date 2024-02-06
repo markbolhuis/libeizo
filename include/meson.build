@@ -1,5 +1,5 @@
 eizo_inc = [
-  'eizo/eizo.h',
+  'eizo/handle.h',
   'eizo/debug.h',
 ]
 

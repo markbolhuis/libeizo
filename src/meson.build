@@ -1,5 +1,5 @@
 src_eizo = [
-  'eizo.c',
+  'handle.c',
   'debug.c',
 ]
 

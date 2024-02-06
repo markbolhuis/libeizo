@@ -9,7 +9,7 @@
 
 #include <linux/hid.h>
 
-#include "eizo/eizo.h"
+#include "eizo/handle.h"
 #include "eizo/debug.h"
 #include "internal.h"
 

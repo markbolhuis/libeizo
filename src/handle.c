@@ -10,7 +10,7 @@
 
 #include <linux/hidraw.h>
 
-#include "eizo/eizo.h"
+#include "eizo/handle.h"
 #include "internal.h"
 
 struct eizo_handle {

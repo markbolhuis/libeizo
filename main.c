@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "eizo/eizo.h"
+#include "eizo/handle.h"
 #include "eizo/debug.h"
 
 int
