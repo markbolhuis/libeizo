@@ -33,11 +33,15 @@ enum eizo_color_temperature : uint16_t {
 };
 
 enum eizo_gamma : uint16_t {
+    EIZO_GAMMA_1_4        = 0x00,
+    EIZO_GAMMA_1_6        = 0x01,
     EIZO_GAMMA_1_8        = 0x02,
     EIZO_GAMMA_2_0        = 0x03,
     EIZO_GAMMA_2_2        = 0x04,
     EIZO_GAMMA_2_4        = 0x05,
     EIZO_GAMMA_2_6        = 0x06,
+    EIZO_GAMMA_2_8        = 0x07,
+    EIZO_GAMMA_3_0        = 0x08,
     EIZO_GAMMA_FPS_HIGH   = 0xf4,
     EIZO_GAMMA_FPS_MEDIUM = 0xf5,
     EIZO_GAMMA_FPS_LOW    = 0xf6,
