@@ -70,10 +70,14 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_TEST_BLUE                    = 0xff00008b,
     EIZO_USAGE_TEST                         = 0xff00008c,
     EIZO_USAGE_PICTURE_EXPANSION            = 0xff0000a5,
+    EIZO_USAGE_BORDER_INTENSITY             = 0xff0000a7,
+    EIZO_USAGE_OFF_TIMER_ENABLE             = 0xff0000a8,
+    EIZO_USAGE_OFF_TIMER_TIME               = 0xff0000aa,
     EIZO_USAGE_SATURATION                   = 0xff0000b3,
     EIZO_USAGE_HUE                          = 0xff0000b4,
     EIZO_USAGE_POWER                        = 0xff0000b8,
     EIZO_USAGE_AUTO_ECOVIEW                 = 0xff0000b9,
+    EIZO_USAGE_OSD_LANGUAGE                 = 0xff0000bc,
     EIZO_USAGE_MODEL_STRING                 = 0xff0000c3,
     EIZO_USAGE_EMERGENCY_POWER              = 0xff0000c5,
     EIZO_USAGE_INPUT_SIGNAL_MODE            = 0xff0000c9,
@@ -251,7 +255,6 @@ enum eizo_usage : uint32_t {
 
     // This is a list of known usages that some monitors
     // support but their value is not known.
-    // EIZO_USAGE_OSD_LANGUAGE
     // EIZO_USAGE_INPUT_RANGE
     // EIZO_USAGE_INPUT_COLOR_FORMAT
     // EIZO_USAGE_BACKLIGHT
