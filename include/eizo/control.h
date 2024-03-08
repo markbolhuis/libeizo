@@ -372,6 +372,12 @@ enum eizo_test_picture : uint16_t {
     EIZO_TEST_PICTURE_BLACK_SQUARE = 19,
 };
 
+enum eizo_vsync_mode : uint16_t {
+    EIZO_VSYNC_MODE_DISABLED = 0,
+    EIZO_VSYNC_MODE_VERTICAL = 32,
+    EIZO_VSYNC_MODE_HORIZONTAL = 96,
+};
+
 struct eizo_factory_panel_luminance {
     uint16_t white;
     uint16_t red;
