@@ -45,6 +45,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_VSYNC_MODE                   = 0xff00002f,
     EIZO_USAGE_EEP_ADDRESS                  = 0xff000030,
     EIZO_USAGE_EEP_DATA                     = 0xff000031,
+    EIZO_USAGE_SERIAL_PRODUCT_STRING_1      = 0xff000035,
     EIZO_USAGE_USAGE_TIME                   = 0xff000037,
     EIZO_USAGE_USAGE_TIME2                  = 0xff000047,
     EIZO_USAGE_RC_SELF_DIAGNOSIS            = 0xff00004e,
@@ -258,7 +259,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_GET_VALUE_V2                 = 0xff300005,
     EIZO_USAGE_HANDLE_COUNTER               = 0xff300006,
     EIZO_USAGE_VERIFY_LAST_REQUEST          = 0xff300007,
-    EIZO_USAGE_SERIAL_PRODUCT_STRING        = 0xff300008,
+    EIZO_USAGE_SERIAL_PRODUCT_STRING_2      = 0xff300008,
 
     // This is a list of known usages that some monitors
     // support but their value is not known.
