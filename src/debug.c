@@ -83,7 +83,7 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 }
 
 void
-eizo_dbg_dump_eep_data(struct eizo_handle *handle)
+eizo_dbg_dump_eeprom(struct eizo_handle *handle)
 {
 #define EEP_SIZE 512
     uint8_t buf[EEP_SIZE];
@@ -97,7 +97,7 @@ eizo_dbg_dump_eep_data(struct eizo_handle *handle)
         u.value = htole16(i);
         enum eizo_result res = eizo_set_value(
             handle,
-            EIZO_USAGE_EEP_ADDRESS,
+            EIZO_USAGE_EEPROM_ADDRESS,
             u.buf, 2);
         if (res < EIZO_SUCCESS) {
             fprintf(stderr, "%s: Failed to set eep address %u.\n",
@@ -105,7 +105,7 @@ eizo_dbg_dump_eep_data(struct eizo_handle *handle)
             return;
         }
 
-        res = eizo_get_value(handle, EIZO_USAGE_EEP_DATA, u.buf, 2);
+        res = eizo_get_value(handle, EIZO_USAGE_EEPROM_DATA, u.buf, 2);
         if (res < EIZO_SUCCESS) {
             fprintf(stderr, "%s: Failed to get eep data at address %u.\n",
                     __func__, i);
