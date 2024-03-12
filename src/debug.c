@@ -10,6 +10,7 @@
 #include <linux/hid.h>
 
 #include "eizo/handle.h"
+#include "eizo/control.h"
 #include "eizo/debug.h"
 #include "internal.h"
 
