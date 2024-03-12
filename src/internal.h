@@ -40,6 +40,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_SETTINGS                     = 0x008200B0,
 
     EIZO_USAGE_COLOR_TEMPERATURE            = 0xff000007,
+    EIZO_USAGE_FF000009_OPTIONS             = 0xff000009,
     EIZO_USAGE_OSD_INDICATOR                = 0xff00000f,
     EIZO_USAGE_PROFILE                      = 0xff000015,
     EIZO_USAGE_VSYNC_MODE                   = 0xff00002f,
@@ -312,6 +313,13 @@ enum eizo_eep_address : uint16_t {
     // switching input sources. The address value is not
     // know, however.
     // EIZO_EEP_ADDRESS_OSD_INPUT_INDICATOR,
+};
+
+enum eizo_ff000009_options : uint16_t {
+    EIZO_FF000009_OPTIONS_INPUT_PRIORITY_MANUAL = 16,
+    EIZO_FF000009_OPTIONS_DVI_DMPM_DISABLED = 32,
+    EIZO_FF000009_OPTIONS_INPUT_PRIORITY_2_OVER_1 = 1024,
+    EIZO_FF000009_OPTIONS_OSD_BEEP_DISABLED = 2048,
 };
 
 struct [[gnu::packed]] eizo_descriptor_report {
