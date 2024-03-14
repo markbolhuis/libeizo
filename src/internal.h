@@ -94,6 +94,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_INPUT_SIGNAL_MODE            = 0xff0000c9,
     EIZO_USAGE_HORIZONTAL_RESOLUTION        = 0xff0000ca,
     EIZO_USAGE_VERTICAL_RESOLUTION          = 0xff0000cb,
+    EIZO_USAGE_UNKNOWN_KEY_VALUE_PAIRS_1    = 0xff0000ce,
     EIZO_USAGE_POWER_LED                    = 0xff0000d3,
     EIZO_USAGE_BOOT_LOGO                    = 0xff0000d4,
     EIZO_USAGE_FIRMWARE_VERSION             = 0xff0000d8,
@@ -263,6 +264,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_HANDLE_COUNTER               = 0xff300006,
     EIZO_USAGE_VERIFY_LAST_REQUEST          = 0xff300007,
     EIZO_USAGE_SERIAL_PRODUCT_STRING_2      = 0xff300008,
+    EIZO_USAGE_UNKNOWN_KEY_VALUE_PAIRS_2    = 0xff300009,
 
     // This is a list of known usages that some monitors
     // support but their value is not known.
