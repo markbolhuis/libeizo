@@ -174,3 +174,10 @@ end:
     free(data);
     return res;
 }
+
+enum eizo_result
+eizo_set_debug_mode(struct eizo_handle *handle, enum eizo_debug_mode mode) {
+    uint8_t buf[1];
+    buf[0] = mode == EIZO_DEBUG_MODE_ENABLED ? 1 : 0;
+    return eizo_set_value(handle, EIZO_USAGE_DEBUG_MODE, buf, 1);
+}

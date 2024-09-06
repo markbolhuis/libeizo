@@ -461,3 +461,6 @@ eizo_get_available_custom_key_lock(
     eizo_handle_t handle,
     uint8_t **ptr,
     size_t *len);
+
+enum eizo_result
+eizo_set_debug_mode(eizo_handle_t handle, enum eizo_debug_mode mode);
