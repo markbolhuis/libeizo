@@ -36,7 +36,7 @@ eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
     int size = -1;
     enum eizo_result res = eizo_get_secondary_descriptor(handle, desc, &size);
     if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: reading the descriptor failed.\n", __func__);
+        fprintf(stderr, "%s: reading the descriptor failed %d.\n", __func__, res);
         return;
     }
 
@@ -59,7 +59,7 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
 
     int i = 0;
     while (i < size) {
-        int key = info[i++];
+        enum eizo_ff300009_key key = info[i++];
         printf("%02x", key);
         if (key == EIZO_FF300009_KEY_END || i == size) {
             printf("\n");
