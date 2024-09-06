@@ -307,6 +307,7 @@ enum eizo_osd_key_lock : uint16_t {
     EIZO_OSD_KEY_LOCK_NONE = 0,
     EIZO_OSD_KEY_LOCK_MENU = 1,
     EIZO_OSD_KEY_LOCK_ALL = 2,
+    EIZO_OSD_KEY_LOCK_CUSTOM = 3,
 };
 
 enum eizo_osd_all_key_lock : bool {
