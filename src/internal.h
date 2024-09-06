@@ -279,6 +279,7 @@ enum eizo_usage : uint32_t {
     // EIZO_USAGE_TEST_MODE
     // EIZO_USAGE_TEST_PICTURE
     // EIZO_USAGE_MAC_ADDRESS
+    // EIZO_USAGE_SYNC_USER_PROFILE_BRIGHTNESS_VALUES
 };
 
 // These values are only tested on the ev2760
