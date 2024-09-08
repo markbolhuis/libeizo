@@ -55,7 +55,7 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
         return;
     }
 
-    printf("info size: %d\n", size);
+    printf("ff300009 size: %d\n", size);
 
     int i = 0;
     while (i < size) {
@@ -171,6 +171,26 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
 }
 
 void
+eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
+{
+    union {
+        struct {
+            uint32_t var1;
+            uint16_t var2;
+        };
+        uint8_t buf[6];
+    } u = {};
+
+    enum eizo_result res = eizo_get_value(handle, EIZO_USAGE_EV_CUSTOM_KEY_LOCK, u.buf, 6);
+    if (res != EIZO_SUCCESS) {
+        fprintf(stderr, "%s: %d\n", __func__, res);
+        return;
+    }
+
+    printf("custom key lock used: 0x%06x %u\n", be32toh(u.var1), le16toh(u.var2));
+}
+
+void
 eizo_dbg_dump_ff01010e(struct eizo_handle *handle)
 {
     union {
@@ -258,6 +278,33 @@ eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
         color |= def[i * 3 + 2];
 
         printf("%-7s#%06x\n", names[i], color);
+    }
+}
+
+void
+eizo_dbg_dump_all_usages(struct eizo_handle *handle)
+{
+    uint8_t buf[32];
+
+    for (uint32_t page = 0xff00; page < 0xff03; ++page) {
+        for (uint32_t id = 0; id < 256; ++id) {
+            uint32_t usage = page << 16 | id;
+            printf("0x%08x: ", usage);
+
+            memset(buf, 0, 32);
+            enum eizo_result res = eizo_get_value(handle, usage, buf, 32);
+            if (res < EIZO_SUCCESS) {
+                printf("error %d\n", res);
+                continue;
+            }
+
+            for (int i = 0; i < 32; ++i) {
+                printf("%02x", buf[i]);
+            }
+
+            printf("\n");
+            usleep(10000);
+        }
     }
 }
 
