@@ -2,8 +2,10 @@
 
 #include <stdint.h>
 #include <endian.h>
+#include <stddef.h>
 
 struct eizo_handle;
+enum eizo_result : int;
 
 // Assume 256 bytes for now, which seems to be the limit for this report.
 #define EIZO_FF300009_MAX_SIZE 256
@@ -368,6 +370,9 @@ eizo_swap_usage(uint32_t value)
 #error "Unknown Endian"
 #endif
 }
+
+const char *
+eizo_usage_to_string(enum eizo_usage usage);
 
 enum eizo_result
 eizo_get_secondary_descriptor(

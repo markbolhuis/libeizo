@@ -332,7 +332,12 @@ eizo_dbg_poll(struct eizo_handle *handle)
                 enum eizo_usage usage = eizo_swap_usage(r.usage);
                 uint16_t counter = le16toh(r.counter);
 
-                printf("%u %08x %u ", r.report_id, usage, counter);
+                const char *ustr = eizo_usage_to_string(usage);
+                if (ustr == nullptr) {
+                    printf("%3u %3u %-20x ", r.report_id, counter, usage);
+                } else {
+                    printf("%3u %3u %-20s ", r.report_id, counter, ustr);
+                }
 
                 n -= 7;
 
