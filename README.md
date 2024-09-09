@@ -15,5 +15,7 @@ Options:
         read-all        - Read all values for every usage.
         eeprom          - Read the contents of the internal EEPROM.
         custom-key-lock - Read the available custom key locks, and the currently used one.
+        gain-definition - Read all available gain definition values.
+        edid            - Read the monitor edid.
         help            - Show this help message.
 ```
