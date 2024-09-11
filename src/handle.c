@@ -22,7 +22,6 @@ struct eizo_handle {
     struct hidraw_report_descriptor descriptor;
 };
 
-[[maybe_unused]]
 static enum eizo_result
 eizo_get_counter(struct eizo_handle *handle, uint16_t *counter) 
 {
@@ -38,7 +37,6 @@ eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
     return EIZO_SUCCESS;
 }
 
-[[maybe_unused]]
 static enum eizo_result
 eizo_get_serial_model(
     struct eizo_handle *handle,
@@ -76,7 +74,6 @@ eizo_get_serial_model(
     return EIZO_SUCCESS;
 }
 
-[[maybe_unused]]
 enum eizo_result
 eizo_get_secondary_descriptor(
     struct eizo_handle *handle,
