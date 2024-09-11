@@ -21,6 +21,7 @@ print_help()
     printf("\tcustom-key-lock - Read the available custom key locks, and the currently used one.\n");
     printf("\tgain-definition - Read all available gain definition values.\n");
     printf("\tedid            - Read the monitor edid.\n");
+    printf("\tdebug           - Put the monitor into 'debug' mode.\n");
     printf("\thelp            - Show this help message.\n");
 }
 
@@ -64,6 +65,8 @@ main(int argc, const char *argv[])
         eizo_dbg_dump_gain_definition(handle);
     } else if (strcmp(argv[1], "edid") == 0) {
         eizo_dbg_dump_edid(handle);
+    } else if (strcmp(argv[1], "debug") == 0) {
+        eizo_set_debug_mode(handle, EIZO_DEBUG_MODE_ENABLED);
     } else {
         fprintf(stderr, "Unknown option \"%s\"\n", argv[1]);
     }
