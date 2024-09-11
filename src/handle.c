@@ -100,18 +100,18 @@ eizo_get_secondary_descriptor(
 
         if (offset != pos) {
             fprintf(stderr, "%s: Invalid offset %u != %u.\n", __func__, offset, pos);
-            return EIZO_ERROR_UNKNOWN;
+            return EIZO_ERROR_BAD_DATA;
         }
 
         if (desc_len == 0) {
             if (len > HID_MAX_DESCRIPTOR_SIZE || len == 0) {
                 fprintf(stderr, "%s: Invalid descriptor size %u.\n", __func__, len);
-                return EIZO_ERROR_UNKNOWN;
+                return EIZO_ERROR_BAD_DATA;
             }
             desc_len = len;
         } else if (desc_len != len) {
             fprintf(stderr, "%s: Invalid length %u at position %u.\n", __func__, len, pos);
-            return EIZO_ERROR_UNKNOWN;
+            return EIZO_ERROR_BAD_DATA;
         }
 
         uint16_t cpy = MIN(desc_len - pos, 512);

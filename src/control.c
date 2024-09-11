@@ -159,7 +159,7 @@ eizo_get_available_custom_key_lock(
         offset = le16toh(u.offset);
         if (offset != i) {
             fprintf(stderr, "%s: Offset %ld != %ld.\n", __func__, offset, i);
-            res = EIZO_ERROR_UNKNOWN;
+            res = EIZO_ERROR_BAD_DATA;
             goto end;
         }
 
