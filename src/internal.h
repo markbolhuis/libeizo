@@ -396,3 +396,6 @@ eizo_set_value(
 
 enum eizo_result
 eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info, int *size);
+
+void
+eizo_parse_descriptor(const uint8_t *desc, size_t len);

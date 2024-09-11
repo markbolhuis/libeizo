@@ -40,8 +40,7 @@ eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
         return;
     }
 
-    printf("secondary descriptor ");
-    eizo_print_hex(desc, (size_t)size);
+    eizo_parse_descriptor(desc, (size_t) size);
 }
 
 void

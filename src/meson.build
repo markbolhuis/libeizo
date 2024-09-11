@@ -14,6 +14,7 @@ src_eizo = [
   'handle.c',
   'control.c',
   'debug.c',
+  'hid.c',
   usage_to_str_c,
 ]
 
