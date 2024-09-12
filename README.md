@@ -17,5 +17,6 @@ Options:
         custom-key-lock - Read the available custom key locks, and the currently used one.
         gain-definition - Read all available gain definition values.
         edid            - Read the monitor edid.
+        debug           - Put the monitor into 'debug' mode.
         help            - Show this help message.
 ```
