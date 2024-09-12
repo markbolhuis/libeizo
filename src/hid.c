@@ -160,7 +160,7 @@ hid_parse_global(struct hid_parser *parser, const struct hid_item *item)
             break;
 
         case HID_TAG_GLOBAL_UNIT:
-            parser->global.unit = hid_item_sdata(item);
+            parser->global.unit = hid_item_udata(item);
             break;
 
         case HID_TAG_GLOBAL_REPORT_SIZE:
