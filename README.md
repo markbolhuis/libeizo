@@ -9,6 +9,7 @@ It is currently in very early stages of development.
 Usage: ./eizoctl <option> <hidraw>
 
 Options:
+        identify        - Identify the monitor.
         poll            - Poll the monitor for events.
         descriptor      - Read the eizo specific HID report descriptor.
         key-pairs       - Read the unknown key value pairs behind usage ff300009.

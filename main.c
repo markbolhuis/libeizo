@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include "eizo/handle.h"
 #include "eizo/debug.h"
@@ -13,6 +14,7 @@ print_help()
     printf("Usage: ./eizoctl <option> <hidraw>\n");
     printf("\n");
     printf("Options:\n");
+    printf("\tidentify        - Identify the monitor.\n");
     printf("\tpoll            - Poll the monitor for events.\n");
     printf("\tdescriptor      - Read the eizo specific HID report descriptor.\n");
     printf("\tkey-pairs       - Read the unknown key value pairs behind usage ff300009.\n");
@@ -67,6 +69,10 @@ main(int argc, const char *argv[])
         eizo_dbg_dump_edid(handle);
     } else if (strcmp(argv[1], "debug") == 0) {
         eizo_set_debug_mode(handle, EIZO_DEBUG_MODE_ENABLED);
+    } else if (strcmp(argv[1], "identify") == 0) {
+        eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_SHOW);
+        sleep(5);
+        eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_HIDE);
     } else {
         fprintf(stderr, "Unknown option \"%s\"\n", argv[1]);
     }

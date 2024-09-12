@@ -292,9 +292,9 @@ enum eizo_power_save : bool {
     EIZO_POWER_SAVE_ENABLED = true,
 };
 
-enum eizo_osd_indicator : uint16_t {
-    EIZO_OSD_INDICATOR_SHOW = 0x4000,
-    EIZO_OSD_INDICATOR_HIDE = 0x8000,
+enum eizo_osd_indicator : bool {
+    EIZO_OSD_INDICATOR_HIDE = false,
+    EIZO_OSD_INDICATOR_SHOW = true,
 };
 
 enum eizo_osd_rotation : uint16_t {
@@ -464,3 +464,6 @@ eizo_get_available_custom_key_lock(
 
 enum eizo_result
 eizo_set_debug_mode(eizo_handle_t handle, enum eizo_debug_mode mode);
+
+enum eizo_result
+eizo_set_osd_indicator(struct eizo_handle *handle, enum eizo_osd_indicator indicator);
