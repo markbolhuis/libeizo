@@ -238,6 +238,7 @@ hid_parse_local(struct hid_parser *parser, const struct hid_item *item)
 
         case HID_TAG_LOCAL_DELIMITER:
             fprintf(stderr, "%s: HID delimiter item found, aborting\n", __func__);
+            [[fallthrough]];
 
         default:
             return -1;
@@ -312,6 +313,10 @@ eizo_parse_descriptor(
     struct hid_local *local = &parser.local;
     struct hid_global *global = &parser.global;
 
+    if (*control_len > 256) {
+        return EIZO_ERROR_INVALID_ARGUMENT;
+    }
+
     size_t i = 0;
     while (true) {
         int item_len = hid_fetch_item(&ptr, end, &item);
@@ -319,7 +324,7 @@ eizo_parse_descriptor(
             break;
         }
 
-        if (i >= 256) {
+        if (i >= *control_len) {
             return EIZO_INCOMPLETE;
         }
 
