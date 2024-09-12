@@ -10,18 +10,6 @@ enum eizo_result : int;
 // Assume 256 bytes for now, which seems to be the limit for this report.
 #define EIZO_FF300009_MAX_SIZE 256
 
-enum eizo_report_id : uint8_t {
-    EIZO_REPORT_ID_DESCRIPTOR = 1,
-    EIZO_REPORT_ID_SET        = 2,
-    EIZO_REPORT_ID_GET        = 3,
-    EIZO_REPORT_ID_SET_V2     = 4,
-    EIZO_REPORT_ID_GET_V2     = 5,
-    EIZO_REPORT_ID_COUNTER    = 6,
-    EIZO_REPORT_ID_VERIFY     = 7,
-    EIZO_REPORT_ID_SN_MODEL   = 8,
-    EIZO_REPORT_ID_INFO       = 9,
-};
-
 enum eizo_ff300009_key : uint8_t {
     EIZO_FF300009_KEY_RESOLUTION = 0x4c,
     EIZO_FF300009_KEY_END = 0xff,

@@ -19,14 +19,24 @@ struct eizo_handle {
     enum eizo_pid pid;
     unsigned long serial;
     char model[17];
-    struct hidraw_report_descriptor descriptor;
+    struct {
+        uint8_t desc;
+        uint8_t set;
+        uint8_t get;
+        uint8_t set_v2;
+        uint8_t get_v2;
+        uint8_t counter;
+        uint8_t verify;
+        uint8_t sn_prod;
+        uint8_t key_value;
+    } rid;
 };
 
 static enum eizo_result
 eizo_get_counter(struct eizo_handle *handle, uint16_t *counter) 
 {
     struct eizo_counter_report r = {};
-    r.report_id = EIZO_REPORT_ID_COUNTER;
+    r.report_id = handle->rid.counter;
 
     int res = ioctl(handle->fd, HIDIOCGFEATURE(3), &r);
     if (res < 0) {
@@ -44,7 +54,7 @@ eizo_get_serial_model(
     char model[17])
 {
     char buf[25];
-    buf[0] = EIZO_REPORT_ID_SN_MODEL;
+    buf[0] = (char)handle->rid.sn_prod;
 
     int res = ioctl(handle->fd, HIDIOCGFEATURE(25), buf);
     if (res < 0) {
@@ -81,7 +91,7 @@ eizo_get_secondary_descriptor(
     int *size)
 {
     struct eizo_descriptor_report r = {};
-    r.report_id = EIZO_REPORT_ID_DESCRIPTOR;
+    r.report_id = handle->rid.desc;
 
     int rc = ioctl(handle->fd, HIDIOCSFEATURE(517), &r);
     if (rc < 0) {
@@ -128,7 +138,7 @@ static enum eizo_result
 eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 {
     struct eizo_verify_report r = {};
-    r.report_id = EIZO_REPORT_ID_VERIFY;
+    r.report_id = handle->rid.verify;
 
     int rc = ioctl(handle->fd, HIDIOCGFEATURE(8), &r);
     if (rc < 0) {
@@ -161,10 +171,10 @@ eizo_get_value(
     unsigned long cap;
 
     if (len <= 32) {
-        r.report_id = EIZO_REPORT_ID_GET;
+        r.report_id = handle->rid.get;
         cap = 39;
     } else if (len <= 512) {
-        r.report_id = EIZO_REPORT_ID_GET_V2;
+        r.report_id = handle->rid.get_v2;
         cap = 519;
     } else {
         return EIZO_ERROR_INVALID_ARGUMENT;
@@ -201,10 +211,10 @@ eizo_set_value(
     unsigned long cap;
 
     if (len <= 32) {
-        r.report_id = EIZO_REPORT_ID_SET;
+        r.report_id = handle->rid.set;
         cap = 39;
     } else if (len <= 512) {
-        r.report_id = EIZO_REPORT_ID_SET_V2;
+        r.report_id = handle->rid.set_v2;
         cap = 519;
     } else {
         return EIZO_ERROR_INVALID_ARGUMENT;
@@ -226,7 +236,7 @@ enum eizo_result
 eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info, int *size)
 {
     uint8_t buf[EIZO_FF300009_MAX_SIZE + 1];
-    buf[0] = EIZO_REPORT_ID_INFO;
+    buf[0] = handle->rid.key_value;
 
     int s = ioctl(handle->fd, HIDIOCGFEATURE(sizeof(buf)), buf);
     if (s < 0) {
@@ -242,7 +252,7 @@ eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info, int *size)
 
 
 static enum eizo_result
-eizo_get_hidraw_descriptor(struct eizo_handle *handle)
+eizo_parse_hidraw_descriptor(struct eizo_handle *handle)
 {
     int size = -1;
 
@@ -251,10 +261,70 @@ eizo_get_hidraw_descriptor(struct eizo_handle *handle)
         return EIZO_ERROR_IO;
     }
 
-    handle->descriptor.size = size;
-    res = ioctl(handle->fd, HIDIOCGRDESC, &handle->descriptor);
+    struct hidraw_report_descriptor desc;
+    desc.size = (uint32_t)size;
+
+    res = ioctl(handle->fd, HIDIOCGRDESC, &desc);
     if (res < 0) {
         return EIZO_ERROR_IO;
+    }
+
+    struct eizo_control control[16];
+    size_t clen = 16;
+
+    res = eizo_parse_descriptor(desc.value, desc.size, control, &clen);
+    if (res < 0) {
+        fprintf(stderr, "%s: failed to parse descriptor. %d\n", __func__, res);
+        return res;
+    }
+
+    unsigned mask = 0;
+    for (size_t i = 0; i < clen; ++i) {
+        switch (control[i].usage) {
+            case EIZO_USAGE_SECONDARY_DESCRIPTOR:
+                handle->rid.desc = control[i].report_id;
+                mask |= 1;
+                break;
+            case EIZO_USAGE_SET_VALUE:
+                handle->rid.set = control[i].report_id;
+                mask |= 2;
+                break;
+            case EIZO_USAGE_GET_VALUE:
+                handle->rid.get = control[i].report_id;
+                mask |= 4;
+                break;
+            case EIZO_USAGE_SET_VALUE_V2:
+                handle->rid.set_v2 = control[i].report_id;
+                mask |= 8;
+                break;
+            case EIZO_USAGE_GET_VALUE_V2:
+                handle->rid.get_v2 = control[i].report_id;
+                mask |= 16;
+                break;
+            case EIZO_USAGE_HANDLE_COUNTER:
+                handle->rid.counter = control[i].report_id;
+                mask |= 32;
+                break;
+            case EIZO_USAGE_VERIFY_LAST_REQUEST:
+                handle->rid.verify = control[i].report_id;
+                mask |= 64;
+                break;
+            case EIZO_USAGE_SERIAL_PRODUCT_STRING_2:
+                handle->rid.sn_prod = control[i].report_id;
+                mask |= 128;
+                break;
+            case EIZO_USAGE_UNKNOWN_KEY_VALUE_PAIRS_2:
+                handle->rid.key_value = control[i].report_id;
+                mask |= 256;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (mask != 511) {
+        fprintf(stderr, "%s: failed to find all required usages. 0b%09b\n", __func__, mask);
+        return EIZO_ERROR_BAD_DATA;
     }
 
     return EIZO_SUCCESS;
@@ -291,7 +361,7 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
         goto err_open;
     }
 
-    res = eizo_get_hidraw_descriptor(h);
+    res = eizo_parse_hidraw_descriptor(h);
     if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: Failed to read hidraw descriptor.\n", __func__);
         goto err_hidraw;
