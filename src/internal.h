@@ -359,6 +359,15 @@ struct [[gnu::packed]] eizo_verify_report {
 } ;
 static_assert(sizeof(struct eizo_verify_report) == 8);
 
+struct eizo_control {
+    enum eizo_usage usage;
+    int32_t logical_minimum;
+    int32_t logical_maximum;
+    uint32_t report_id;
+    uint32_t report_size;
+    uint32_t report_count;
+};
+
 static inline uint32_t
 eizo_swap_usage(uint32_t value)
 {
@@ -397,5 +406,12 @@ eizo_set_value(
 enum eizo_result
 eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info, int *size);
 
+enum eizo_result
+eizo_parse_descriptor(
+    const uint8_t *desc,
+    size_t desc_len,
+    struct eizo_control control[256],
+    size_t *control_len);
+
 void
-eizo_parse_descriptor(const uint8_t *desc, size_t len);
+eizo_print_descriptor(const uint8_t *desc, size_t len);

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <memory.h>
 
+#include "eizo/handle.h"
 #include "internal.h"
 
 #define HID_GLOBAL_STACK_LEN 4
@@ -296,37 +297,42 @@ hid_fetch_item(const uint8_t **_ptr, const uint8_t *end, struct hid_item *item)
     return 0;
 }
 
-void
-eizo_parse_descriptor(const uint8_t *desc, size_t len)
+enum eizo_result
+eizo_parse_descriptor(
+    const uint8_t *desc,
+    size_t desc_len,
+    struct eizo_control control[256],
+    size_t *control_len)
 {
     struct hid_item item;
     const uint8_t *ptr = desc;
-    const uint8_t *end = desc + len;
+    const uint8_t *end = desc + desc_len;
 
     struct hid_parser parser;
     struct hid_local *local = &parser.local;
     struct hid_global *global = &parser.global;
 
+    size_t i = 0;
     while (true) {
         int item_len = hid_fetch_item(&ptr, end, &item);
         if (item_len < 0) {
             break;
         }
 
+        if (i >= 256) {
+            return EIZO_INCOMPLETE;
+        }
+
         switch (item.type) {
             case HID_TYPE_MAIN:
                 if (item.tag == HID_TAG_MAIN_FEATURE) {
-                    uint32_t usage = global->usage_page << 16 | local->usage;
-                    const char *ustr = eizo_usage_to_string(usage);
-
-                    printf("%3u | 0x%08x | %-40s | %4u | %5u | %11i | %11i |\n",
-                           global->report_id,
-                           usage,
-                           ustr == nullptr ? "" : ustr,
-                           global->report_size,
-                           global->report_count,
-                           global->logical_minimum,
-                           global->logical_maximum);
+                    control[i].usage = global->usage_page << 16 | local->usage;
+                    control[i].logical_minimum = global->logical_minimum;
+                    control[i].logical_maximum = global->logical_maximum;
+                    control[i].report_id = global->report_id;
+                    control[i].report_count = global->report_count;
+                    control[i].report_size = global->report_size;
+                    ++i;
                 }
                 memset(local, 0, sizeof(*local));
                 break;
@@ -343,5 +349,36 @@ eizo_parse_descriptor(const uint8_t *desc, size_t len)
             default:
                 break;
         }
+    }
+
+    *control_len = i;
+    return EIZO_SUCCESS;
+}
+
+void
+eizo_print_descriptor(const uint8_t *desc, size_t len)
+{
+    struct eizo_control control[256];
+
+    size_t clen = 256;
+    enum eizo_result res = eizo_parse_descriptor(desc, len, control, &clen);
+    if (res < EIZO_SUCCESS) {
+        fprintf(stderr, "%s: Failed to parse descriptor %d\n", __func__, res);
+        return;
+    }
+
+    for (size_t i = 0; i < clen; ++i) {
+        const char *ustr = eizo_usage_to_string(control[i].usage);
+        if (ustr == nullptr) {
+            ustr = "?";
+        }
+        printf("%3u | 0x%08x | %-40s | %4u | %5u | %11i | %11i |\n",
+               control[i].report_id,
+               control[i].usage,
+               ustr,
+               control[i].report_size,
+               control[i].report_count,
+               control[i].logical_minimum,
+               control[i].logical_maximum);
     }
 }
