@@ -331,13 +331,17 @@ eizo_parse_hidraw_descriptor(struct eizo_handle *handle)
 }
 
 static enum eizo_result
-eizo_get_hidraw_devinfo(struct eizo_handle *handle)
+eizo_parse_hidraw_devinfo(struct eizo_handle *handle)
 {
     struct hidraw_devinfo devinfo = {};
 
     int res = ioctl(handle->fd, HIDIOCGRAWINFO, &devinfo);
     if (res < 0) {
         return EIZO_ERROR_IO;
+    }
+
+    if (devinfo.vendor != EIZO_VID) {
+        return EIZO_ERROR_UNKNOWN;
     }
 
     handle->pid = devinfo.product;
@@ -361,15 +365,15 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
         goto err_open;
     }
 
-    res = eizo_parse_hidraw_descriptor(h);
+    res = eizo_parse_hidraw_devinfo(h);
     if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: Failed to read hidraw descriptor.\n", __func__);
+        fprintf(stderr, "%s: Failed to read hidraw devinfo. %d\n", __func__, res);
         goto err_hidraw;
     }
 
-    res = eizo_get_hidraw_devinfo(h);
+    res = eizo_parse_hidraw_descriptor(h);
     if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: Failed to read hidraw devinfo.\n", __func__);
+        fprintf(stderr, "%s: Failed to read hidraw descriptor. %d\n", __func__, res);
         goto err_hidraw;
     }
 
