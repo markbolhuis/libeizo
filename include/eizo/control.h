@@ -207,8 +207,8 @@ enum eizo_power : bool {
 };
 
 enum eizo_window_highlight : bool {
-    EIZO_WINDOW_HIGHLIGHT_DISABLED = false,
-    EIZO_WINDOW_HIGHLIGHT_ENABLED = true,
+    EIZO_WINDOW_HIGHLIGHT_HIDDEN = false,
+    EIZO_WINDOW_HIGHLIGHT_VISIBLE = true,
 };
 
 enum eizo_window : uint16_t {
