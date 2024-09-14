@@ -15,7 +15,7 @@ void
 eizo_dbg_dump_available_custom_key_lock(eizo_handle_t handle);
 
 void
-eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle);
+eizo_dbg_dump_custom_key_lock(eizo_handle_t handle);
 
 void
 eizo_dbg_dump_ff01010e(eizo_handle_t handle);
@@ -30,7 +30,7 @@ void
 eizo_dbg_dump_gain_definition(eizo_handle_t handle);
 
 void
-eizo_dbg_dump_all_usages(struct eizo_handle *handle);
+eizo_dbg_dump_all_usages(eizo_handle_t handle);
 
 int
 eizo_dbg_poll(eizo_handle_t handle);
