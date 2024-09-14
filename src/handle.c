@@ -244,9 +244,9 @@ eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info, int *size)
     }
 
     if (s > 1) {
-        memcpy(info, buf + 1, s - 1);
+        memcpy(info, buf + 1, --s);
     }
-    *size = s == 0 ? 0 : s - 1;
+    *size = s;
     return EIZO_SUCCESS;
 }
 
