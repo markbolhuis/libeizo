@@ -293,8 +293,8 @@ enum eizo_power_save : bool {
 };
 
 enum eizo_osd_indicator : bool {
-    EIZO_OSD_INDICATOR_HIDE = false,
-    EIZO_OSD_INDICATOR_SHOW = true,
+    EIZO_OSD_INDICATOR_HIDDEN = false,
+    EIZO_OSD_INDICATOR_VISIBLE = true,
 };
 
 enum eizo_osd_rotation : unsigned {

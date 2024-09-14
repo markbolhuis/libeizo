@@ -70,9 +70,9 @@ main(int argc, const char *argv[])
     } else if (strcmp(argv[1], "debug") == 0) {
         eizo_set_debug_mode(handle, EIZO_DEBUG_MODE_ENABLED);
     } else if (strcmp(argv[1], "identify") == 0) {
-        eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_SHOW);
+        eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_VISIBLE);
         sleep(5);
-        eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_HIDE);
+        eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_HIDDEN);
     } else {
         fprintf(stderr, "Unknown option \"%s\"\n", argv[1]);
     }
