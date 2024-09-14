@@ -439,16 +439,16 @@ struct eizo_6axis_colors {
 };
 
 enum eizo_result
-eizo_get_brightness(eizo_handle_t handle, uint16_t *value);
+eizo_get_brightness(eizo_handle_t handle, int *value);
 
 enum eizo_result
-eizo_set_brightness(eizo_handle_t handle, uint16_t value);
+eizo_set_brightness(eizo_handle_t handle, int value);
 
 enum eizo_result
-eizo_get_contrast(eizo_handle_t handle, uint16_t *value);
+eizo_get_contrast(eizo_handle_t handle, int *value);
 
 enum eizo_result
-eizo_set_contrast(eizo_handle_t handle, uint16_t value);
+eizo_set_contrast(eizo_handle_t handle, int value);
 
 enum eizo_result
 eizo_get_usage_time(eizo_handle_t handle, long *time);

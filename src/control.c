@@ -35,27 +35,43 @@ eizo_set_uint16(struct eizo_handle *handle, enum eizo_usage usage, uint16_t valu
 }
 
 enum eizo_result
-eizo_get_brightness(struct eizo_handle *handle, uint16_t *value)
+eizo_get_brightness(struct eizo_handle *handle, int *value)
 {
-    return eizo_get_uint16(handle, EIZO_USAGE_BRIGHTNESS, value);
+    uint16_t val = 0;
+    enum eizo_result res = eizo_get_uint16(handle, EIZO_USAGE_BRIGHTNESS, &val);
+    if (res >= EIZO_SUCCESS) {
+        *value = (int)val;
+    }
+    return res;
 }
 
 enum eizo_result
-eizo_set_brightness(struct eizo_handle *handle, uint16_t value)
+eizo_set_brightness(struct eizo_handle *handle, int value)
 {
-    return eizo_set_uint16(handle, EIZO_USAGE_BRIGHTNESS, value);
+    if (value < 0 || value > 200) {
+        return EIZO_ERROR_INVALID_ARGUMENT;
+    }
+    return eizo_set_uint16(handle, EIZO_USAGE_BRIGHTNESS, (uint16_t)value);
 }
 
 enum eizo_result
-eizo_get_contrast(struct eizo_handle *handle, uint16_t *value)
+eizo_get_contrast(struct eizo_handle *handle, int *value)
 {
-    return eizo_get_uint16(handle, EIZO_USAGE_CONTRAST, value);
+    uint16_t val = 0;
+    enum eizo_result res = eizo_get_uint16(handle, EIZO_USAGE_CONTRAST, &val);
+    if (res >= EIZO_SUCCESS) {
+        *value = (int)val;
+    }
+    return res;
 }
 
 enum eizo_result
-eizo_set_contrast(struct eizo_handle *handle, uint16_t value)
+eizo_set_contrast(struct eizo_handle *handle, int value)
 {
-    return eizo_set_uint16(handle, EIZO_USAGE_CONTRAST, value);
+    if (value < 0 || value > 140) {
+        return EIZO_ERROR_INVALID_ARGUMENT;
+    }
+    return eizo_set_uint16(handle, EIZO_USAGE_CONTRAST, (uint16_t)value);
 }
 
 enum eizo_result
