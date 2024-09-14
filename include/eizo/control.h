@@ -4,7 +4,7 @@
 
 #include "handle.h"
 
-enum eizo_color_temperature : uint16_t {
+enum eizo_color_temperature : unsigned {
     EIZO_COLOR_TEMPERATURE_OFF    = 0,
     EIZO_COLOR_TEMPERATURE_4000K  = 1,
     EIZO_COLOR_TEMPERATURE_4500K  = 2,
@@ -32,7 +32,7 @@ enum eizo_color_temperature : uint16_t {
     EIZO_COLOR_TEMPERATURE_15000K = 24,
 };
 
-enum eizo_gamma : uint16_t {
+enum eizo_gamma : unsigned {
     EIZO_GAMMA_1_4        = 0x00,
     EIZO_GAMMA_1_6        = 0x01,
     EIZO_GAMMA_1_8        = 0x02,
@@ -49,7 +49,7 @@ enum eizo_gamma : uint16_t {
     EIZO_GAMMA_FPS_POWER  = 0xfc,
 };
 
-enum eizo_input_signal_mode : uint16_t {
+enum eizo_input_signal_mode : unsigned {
     EIZO_INPUT_SIGNAL_MODE_ANALOGUE = 0,
     EIZO_INPUT_SIGNAL_MODE_DIGITAL = 1,
     EIZO_INPUT_SIGNAL_MODE_UNKNOWN = 2,
@@ -60,7 +60,7 @@ enum eizo_auto_input : bool {
     EIZO_AUTO_INPUT_ENABLED = true,
 };
 
-enum eizo_input_port : uint16_t {
+enum eizo_input_port : unsigned {
     EIZO_INPUT_PORT_UNDEFINED  = 0x0000,
     EIZO_INPUT_PORT_DSUB1      = 0x0100,
     EIZO_INPUT_PORT_DSUB2      = 0x0101,
@@ -108,7 +108,7 @@ enum eizo_power_led : bool {
     EIZO_POWER_LED_ENABLED = true,
 };
 
-enum eizo_profile : uint16_t {
+enum eizo_profile : unsigned {
     EIZO_PROFILE_TEXT             = 0,
     EIZO_PROFILE_PICTURE          = 1,
     EIZO_PROFILE_MOVIE            = 2,
@@ -160,7 +160,7 @@ enum eizo_profile : uint16_t {
     EIZO_PROFILE_REC2020          = 48,
 };
 
-enum eizo_profile_flags : uint16_t {
+enum eizo_profile_flags : unsigned {
     EIZO_PROFILE_FLAGS_BRIGHTNESS          = 0x0001,
     EIZO_PROFILE_FLAGS_CONTRAST            = 0x0002,
     EIZO_PROFILE_FLAGS_COLOR_TEMPERATURE   = 0x0004,
@@ -176,7 +176,7 @@ enum eizo_profile_flags : uint16_t {
 };
 
 // Unknown values
-enum eizo_input_color_format : uint16_t {
+enum eizo_input_color_format : unsigned {
     EIZO_INPUT_COLOR_FORMAT_AUTO,
     EIZO_INPUT_COLOR_FORMAT_YUV_422,
     EIZO_INPUT_COLOR_FORMAT_YUV_444,
@@ -190,13 +190,13 @@ enum eizo_input_color_format : uint16_t {
     EIZO_INPUT_COLOR_FORMAT_RGB444_12BIT,
 };
 
-enum eizo_input_range : uint16_t {
+enum eizo_input_range : unsigned {
     EIZO_INPUT_RANGE_AUTO = 0,
     EIZO_INPUT_RANGE_FULL = 1,
     EIZO_INPUT_RANGE_LIMITED = 2,
 };
 
-enum eizo_display_port_version : uint16_t {
+enum eizo_display_port_version : unsigned {
     EIZO_DISPLAY_PORT_VERSION_1_1 = 0,
     EIZO_DISPLAY_PORT_VERSION_1_2 = 1,
 };
@@ -211,7 +211,7 @@ enum eizo_window_highlight : bool {
     EIZO_WINDOW_HIGHLIGHT_VISIBLE = true,
 };
 
-enum eizo_window : uint16_t {
+enum eizo_window : unsigned {
     EIZO_WINDOW_1 = 0,
     EIZO_WINDOW_2 = 1,
     EIZO_WINDOW_3 = 2,
@@ -226,13 +226,13 @@ enum eizo_compatibility_mode : bool {
     EIZO_COMPATIBILITY_MODE_ENABLED = true,
 };
 
-enum eizo_super_resolution : uint16_t {
+enum eizo_super_resolution : unsigned {
     EIZO_SUPER_RESOLUTION_DISABLED = 0,
     EIZO_SUPER_RESOLUTION_STANDARD = 1,
     EIZO_SUPER_RESOLUTION_ENHANCED = 2,
 };
 
-enum eizo_contrast_enhancer : uint16_t {
+enum eizo_contrast_enhancer : unsigned {
     EIZO_CONTRAST_ENHANCER_DISABLED = 0,
     EIZO_CONTRAST_ENHANCER_STANDARD = 1,
     EIZO_CONTRAST_ENHANCER_ENHANCED = 2,
@@ -243,7 +243,7 @@ enum eizo_auto_ecoview : bool {
     EIZO_AUTO_ECOVIEW_ENABLED = true,
 };
 
-enum eizo_ecoview_ambient_light : uint16_t {
+enum eizo_ecoview_ambient_light : unsigned {
     EIZO_ECOVIEW_AMBIENT_LIGHT_DARK = 0,
     EIZO_ECOVIEW_AMBIENT_LIGHT_STANDARD = 1,
     EIZO_ECOVIEW_AMBIENT_LIGHT_BRIGHT = 2,
@@ -254,7 +254,7 @@ enum eizo_ecoview_optimizer_v2 : bool {
     EIZO_ECOVIEW_OPTIMIZER_V2_ENABLED = true,
 };
 
-enum eizo_ecoview_sense_time : uint16_t {
+enum eizo_ecoview_sense_time : unsigned {
     EIZO_ECOVIEW_SENSE_TIME_5_SEC  = 0,
     EIZO_ECOVIEW_SENSE_TIME_30_SEC = 1,
     EIZO_ECOVIEW_SENSE_TIME_1_MIN  = 2,
@@ -267,7 +267,7 @@ enum eizo_ecoview_sense_time : uint16_t {
     EIZO_ECOVIEW_SENSE_TIME_60_MIN = 9,
 };
 
-enum eizo_ecoview_sense_power_state : uint16_t {
+enum eizo_ecoview_sense_power_state : unsigned {
     EIZO_ECOVIEW_SENSE_POWER_STATE_RESERVED = 0,
     EIZO_ECOVIEW_SENSE_POWER_STATE_NO_SIGNAL = 1,
     EIZO_ECOVIEW_SENSE_POWER_STATE_AB_SENSE = 2,
@@ -275,13 +275,13 @@ enum eizo_ecoview_sense_power_state : uint16_t {
     EIZO_ECOVIEW_SENSE_POWER_STATE_EXPECT = 255,
 };
 
-enum eizo_picture_expansion : uint16_t {
+enum eizo_picture_expansion : unsigned {
     EIZO_PICTURE_EXPANSION_DOT_BY_DOT = 0,
     EIZO_PICTURE_EXPANSION_ASPECT_RATIO = 1,
     EIZO_PICTURE_EXPANSION_FULLSCREEN = 2,
 };
 
-enum eizo_overdrive : uint16_t {
+enum eizo_overdrive : unsigned {
     EIZO_OVERDRIVE_DISABLED = 0,
     EIZO_OVERDRIVE_STANDARD = 1,
     EIZO_OVERDRIVE_ENHANCED = 2,
@@ -297,13 +297,13 @@ enum eizo_osd_indicator : bool {
     EIZO_OSD_INDICATOR_SHOW = true,
 };
 
-enum eizo_osd_rotation : uint16_t {
+enum eizo_osd_rotation : unsigned {
     EIZO_OSD_ROTATION_0 = 0,
     EIZO_OSD_ROTATION_90 = 1,
     EIZO_OSD_ROTATION_270 = 2,
 };
 
-enum eizo_osd_key_lock : uint16_t {
+enum eizo_osd_key_lock : unsigned {
     EIZO_OSD_KEY_LOCK_NONE = 0,
     EIZO_OSD_KEY_LOCK_MENU = 1,
     EIZO_OSD_KEY_LOCK_ALL = 2,
@@ -315,7 +315,7 @@ enum eizo_osd_all_key_lock : bool {
     EIZO_OSD_ALL_KEY_LOCK_ENABLED = true,
 };
 
-enum eizo_osd_language : uint16_t {
+enum eizo_osd_language : unsigned {
     EIZO_OSD_LANGUAGE_ENGLISH = 0,
     EIZO_OSD_LANGUAGE_GERMAN = 1,
     EIZO_OSD_LANGUAGE_FRENCH = 2,
@@ -327,18 +327,18 @@ enum eizo_osd_language : uint16_t {
     EIZO_OSD_LANGUAGE_CHINESE_TRADITIONAL = 8,
 };
 
-enum eizo_destination : uint16_t {
+enum eizo_destination : unsigned {
     EIZO_DESTINATION_JAPAN = 0,
     EIZO_DESTINATION_INTERNATIONAL = 1,
 };
 
-enum eizo_split_display_mode : uint16_t {
+enum eizo_split_display_mode : unsigned {
     EIZO_SPLIT_DISPLAY_MODE_SINGLE = 0,
     EIZO_SPLIT_DISPLAY_MODE_PICTURE_BY_PICTURE = 1,
     EIZO_SPLIT_DISPLAY_MODE_PICTURE_IN_PICTURE = 2,
 };
 
-enum eizo_picture_by_picture_layout : uint16_t {
+enum eizo_picture_by_picture_layout : unsigned {
     EIZO_PICTURE_BY_PICTURE_LAYOUT_1 = 0,
     EIZO_PICTURE_BY_PICTURE_LAYOUT_2 = 1,
     EIZO_PICTURE_BY_PICTURE_LAYOUT_3 = 2,
@@ -347,7 +347,7 @@ enum eizo_picture_by_picture_layout : uint16_t {
     EIZO_PICTURE_BY_PICTURE_LAYOUT_6 = 5,
 };
 
-enum eizo_button : uint8_t {
+enum eizo_button : unsigned {
     EIZO_BUTTON_1 = 0b00000001,
     EIZO_BUTTON_2 = 0b00000010,
     EIZO_BUTTON_3 = 0b00000100,
@@ -363,7 +363,7 @@ enum eizo_boot_logo : bool {
     EIZO_BOOT_LOGO_ENABLED = true,
 };
 
-enum eizo_s2431w_signal : uint16_t {
+enum eizo_s2431w_signal : unsigned {
     EIZO_S2431W_SIGNAL_VIDEO = 0,
     EIZO_S2431W_SIGNAL_COLOR_FIELD = 1,
     EIZO_S2431W_SIGNAL_1PX_CHECKERBOARD = 4,
@@ -387,7 +387,7 @@ enum eizo_s2431w_signal : uint16_t {
     EIZO_S2431W_SIGNAL_VERTICAL_RAMP = 31,
 };
 
-enum eizo_test_picture : uint16_t {
+enum eizo_test_picture : unsigned {
     EIZO_TEST_PICTURE_WHITE_FULL_SCREEN = 2,
     EIZO_TEST_PICTURE_WHITE_BLACK_BORDER = 6,
     EIZO_TEST_PICTURE_RED_GRADIENT = 9,
@@ -397,7 +397,7 @@ enum eizo_test_picture : uint16_t {
     EIZO_TEST_PICTURE_BLACK_SQUARE = 19,
 };
 
-enum eizo_vsync_mode : uint16_t {
+enum eizo_vsync_mode : unsigned {
     EIZO_VSYNC_MODE_DISABLED = 0,
     EIZO_VSYNC_MODE_VERTICAL = 32,
     EIZO_VSYNC_MODE_HORIZONTAL = 96,
