@@ -207,8 +207,8 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_DUE_TC_STATUS                = 0xff020049,
     EIZO_USAGE_FACTORY_PANEL_LUMINANCE      = 0xff020055,
     EIZO_USAGE_REAR_LUT                     = 0xff020082,
-    EIZO_USAGE_GAIN_DEFINITION_1            = 0xff0200dc,
-    EIZO_USAGE_GAIN_DEFINITION_2            = 0xff0200dd,
+    EIZO_USAGE_GAIN_DEFINITION_UNKNOWN      = 0xff0200dc,
+    EIZO_USAGE_GAIN_DEFINITION_DATA         = 0xff0200dd,
     EIZO_USAGE_ADJUSTMENT_ID                = 0xff020100,
 
     EIZO_USAGE_SELF_QC_CALIBRATION          = 0xff030001,

@@ -252,13 +252,13 @@ eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
 {
     uint8_t def[75];
 
-    enum eizo_result res = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_1, def, 1);
+    enum eizo_result res = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_UNKNOWN, def, 1);
     if (res < EIZO_SUCCESS) {
         return;
     }
     printf("gain definition: %u\n", def[0]);
 
-    res = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_2, def, 75);
+    res = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_DATA, def, 75);
     if (res < EIZO_SUCCESS) {
         return;
     }
