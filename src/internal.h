@@ -395,6 +395,9 @@ enum eizo_result
 eizo_get_ff300009(struct eizo_handle *handle, uint8_t *info, int *size);
 
 enum eizo_result
+eizo_get_available_custom_key_lock_raw(struct eizo_handle *handle, uint8_t **ptr, size_t *len);
+
+enum eizo_result
 eizo_parse_descriptor(
     const uint8_t *desc,
     size_t desc_len,

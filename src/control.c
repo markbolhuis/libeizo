@@ -114,10 +114,7 @@ eizo_set_usage_time(struct eizo_handle *handle, long time)
 }
 
 enum eizo_result
-eizo_get_available_custom_key_lock(
-    struct eizo_handle *handle,
-    uint8_t **ptr,
-    size_t *len)
+eizo_get_available_custom_key_lock_raw(struct eizo_handle *handle, uint8_t **ptr, size_t *len)
 {
     union {
         struct {

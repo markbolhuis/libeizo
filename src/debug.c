@@ -124,7 +124,7 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
     uint8_t *data = nullptr;
     size_t size = 0;
 
-    enum eizo_result res = eizo_get_available_custom_key_lock(
+    enum eizo_result res = eizo_get_available_custom_key_lock_raw(
         handle, &data, &size);
     if (res < EIZO_SUCCESS) {
         return;
