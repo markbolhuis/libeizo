@@ -21,10 +21,8 @@ struct eizo_handle {
     char model[17];
     struct {
         uint8_t desc;
-        uint8_t set;
-        uint8_t get;
-        uint8_t set_v2;
-        uint8_t get_v2;
+        uint8_t set[2];
+        uint8_t get[2];
         uint8_t counter;
         uint8_t verify;
         uint8_t sn_prod;
@@ -171,10 +169,10 @@ eizo_get_value(
     unsigned long cap;
 
     if (len <= 32) {
-        r.report_id = handle->rid.get;
+        r.report_id = handle->rid.get[0];
         cap = 39;
     } else if (len <= 512) {
-        r.report_id = handle->rid.get_v2;
+        r.report_id = handle->rid.get[1];
         cap = 519;
     } else {
         return EIZO_ERROR_INVALID_ARGUMENT;
@@ -211,10 +209,10 @@ eizo_set_value(
     unsigned long cap;
 
     if (len <= 32) {
-        r.report_id = handle->rid.set;
+        r.report_id = handle->rid.set[0];
         cap = 39;
     } else if (len <= 512) {
-        r.report_id = handle->rid.set_v2;
+        r.report_id = handle->rid.set[1];
         cap = 519;
     } else {
         return EIZO_ERROR_INVALID_ARGUMENT;
@@ -273,7 +271,7 @@ eizo_parse_hidraw_descriptor(struct eizo_handle *handle)
     size_t clen = 16;
 
     res = eizo_parse_descriptor(desc.value, desc.size, control, &clen);
-    if (res < 0) {
+    if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: failed to parse descriptor. %d\n", __func__, res);
         return res;
     }
@@ -286,19 +284,19 @@ eizo_parse_hidraw_descriptor(struct eizo_handle *handle)
                 mask |= 1;
                 break;
             case EIZO_USAGE_SET_VALUE:
-                handle->rid.set = control[i].report_id;
+                handle->rid.set[0] = control[i].report_id;
                 mask |= 2;
                 break;
             case EIZO_USAGE_GET_VALUE:
-                handle->rid.get = control[i].report_id;
+                handle->rid.get[0] = control[i].report_id;
                 mask |= 4;
                 break;
             case EIZO_USAGE_SET_VALUE_V2:
-                handle->rid.set_v2 = control[i].report_id;
+                handle->rid.set[1] = control[i].report_id;
                 mask |= 8;
                 break;
             case EIZO_USAGE_GET_VALUE_V2:
-                handle->rid.get_v2 = control[i].report_id;
+                handle->rid.get[1] = control[i].report_id;
                 mask |= 16;
                 break;
             case EIZO_USAGE_HANDLE_COUNTER:
