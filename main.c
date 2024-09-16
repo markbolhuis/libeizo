@@ -11,7 +11,7 @@
 void
 print_help()
 {
-    printf("Usage: ./eizoctl <option> <hidraw>\n");
+    printf("Usage: ./eizoctl <option>\n");
     printf("\n");
     printf("Options:\n");
     printf("\tidentify        - Identify the monitor.\n");
@@ -39,12 +39,15 @@ main(int argc, const char *argv[])
         return EXIT_SUCCESS;
     }
 
-    if (argc < 3) {
+    struct eizo_info info[1];
+    size_t len = 1;
+    enum eizo_result res = eizo_enumerate(info, &len);
+    if (res < EIZO_SUCCESS || len == 0) {
         return EXIT_FAILURE;
     }
 
     eizo_handle_t handle = nullptr;
-    enum eizo_result res = eizo_open_hidraw(argv[2], &handle);
+    res = eizo_open_hidraw(info[0].devnode, &handle);
     if (res < EIZO_SUCCESS || handle == nullptr) {
         return EXIT_FAILURE;
     }

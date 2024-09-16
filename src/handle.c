@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <libudev.h>
 #include <linux/hidraw.h>
 
 #include "eizo/handle.h"
@@ -344,6 +345,73 @@ eizo_parse_hidraw_devinfo(struct eizo_handle *handle)
 
     handle->pid = devinfo.product;
     return EIZO_SUCCESS;
+}
+
+enum eizo_result
+eizo_enumerate(struct eizo_info *info, size_t *len)
+{
+    enum eizo_result res = EIZO_ERROR_UNKNOWN;
+
+    struct udev *udev = udev_new();
+    if (!udev) {
+        return res;
+    }
+
+    struct udev_enumerate *enumerate = udev_enumerate_new(udev);
+    if (!enumerate) {
+        goto err_enum;
+    }
+
+    udev_enumerate_add_match_subsystem(enumerate, "hidraw");
+    udev_enumerate_scan_devices(enumerate);
+
+    struct udev_list_entry *entry, *entries = udev_enumerate_get_list_entry(enumerate);
+    if (!entries) {
+        goto err_entries;
+    }
+
+    size_t i = 0;
+    udev_list_entry_foreach(entry, entries) {
+        if (i >= *len) {
+            res = EIZO_INCOMPLETE;
+            goto exit;
+        }
+
+        const char *name = udev_list_entry_get_name(entry);
+        struct udev_device *device = udev_device_new_from_syspath(udev, name);
+        if (!device) {
+            continue;
+        }
+
+        struct udev_device *parent = udev_device_get_parent_with_subsystem_devtype(
+            device, "usb", "usb_device");
+        if (parent) {
+            const char *vid_str = udev_device_get_sysattr_value(parent, "idVendor");
+            const char *pid_str = udev_device_get_sysattr_value(parent, "idProduct");
+            if (vid_str && pid_str) {
+                unsigned long pid = strtoul(pid_str, nullptr, 16);
+                unsigned long vid = strtoul(vid_str, nullptr, 16);
+
+                if (vid == EIZO_VID) {
+                    const char *node = udev_device_get_devnode(device);
+                    strncpy(info[i].devnode, node, 16);
+                    info[i].pid = pid;
+                    ++i;
+                }
+            }
+        }
+
+        udev_device_unref(device);
+    }
+
+    *len = i;
+    res = EIZO_SUCCESS;
+exit:
+err_entries:
+    udev_enumerate_unref(enumerate);
+err_enum:
+    udev_unref(udev);
+    return res;
 }
 
 enum eizo_result

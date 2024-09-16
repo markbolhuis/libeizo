@@ -9,6 +9,8 @@ project(
 
 inc = include_directories('include')
 
+dep_udev = dependency('libudev')
+
 subdir('include')
 subdir('src')
 

@@ -6,7 +6,7 @@ It is currently in very early stages of development.
 ## eizoctl
 
 ```
-Usage: ./eizoctl <option> <hidraw>
+Usage: ./eizoctl <option>
 
 Options:
         identify        - Identify the monitor.
