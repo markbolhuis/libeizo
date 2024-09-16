@@ -78,7 +78,7 @@ enum eizo_usage : uint32_t {
     EIZO_USAGE_POWER                        = 0xff0000b8,
     EIZO_USAGE_AUTO_ECOVIEW                 = 0xff0000b9,
     EIZO_USAGE_OSD_LANGUAGE                 = 0xff0000bc,
-    EIZO_USAGE_MODEL_STRING                 = 0xff0000c3,
+    EIZO_USAGE_PRODUCT_STRING               = 0xff0000c3,
     EIZO_USAGE_SRGB_BRIGHT                  = 0xff0000c4,
     EIZO_USAGE_EMERGENCY_POWER              = 0xff0000c5,
     EIZO_USAGE_INPUT_SIGNAL_MODE            = 0xff0000c9,

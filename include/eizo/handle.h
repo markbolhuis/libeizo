@@ -101,4 +101,4 @@ unsigned long
 eizo_get_serial(eizo_handle_t handle);
 
 const char *
-eizo_get_model(eizo_handle_t handle);
+eizo_get_product(eizo_handle_t handle);

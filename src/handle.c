@@ -19,7 +19,7 @@ struct eizo_handle {
     uint16_t counter;
     enum eizo_pid pid;
     unsigned long serial;
-    char model[17];
+    char product[17];
     struct {
         uint8_t desc;
         uint8_t set[2];
@@ -47,10 +47,10 @@ eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
 }
 
 static enum eizo_result
-eizo_get_serial_model(
+eizo_get_serial_product(
     struct eizo_handle *handle,
     unsigned long *serial,
-    char model[17])
+    char product[17])
 {
     char buf[25];
     buf[0] = (char)handle->rid.sn_prod;
@@ -65,9 +65,9 @@ eizo_get_serial_model(
         if (buf[9 + i] == ' ') {
             break;
         }
-        model[i] = buf[9 + i];
+        product[i] = buf[9 + i];
     }
-    model[i] = '\0';
+    product[i] = '\0';
 
     buf[9] = '\0';
     char *end = nullptr;
@@ -444,7 +444,7 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
     }
 
     eizo_get_counter(h, &h->counter);
-    eizo_get_serial_model(h, &h->serial, h->model);
+    eizo_get_serial_product(h, &h->serial, h->product);
     *handle = h;
     return EIZO_SUCCESS;
 
@@ -481,7 +481,7 @@ eizo_get_serial(struct eizo_handle *handle)
 }
 
 const char *
-eizo_get_model(struct eizo_handle *handle)
+eizo_get_product(struct eizo_handle *handle)
 {
-    return handle->model;
+    return handle->product;
 }
