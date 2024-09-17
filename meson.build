@@ -9,7 +9,7 @@ project(
 
 inc = include_directories('include')
 
-dep_udev = dependency('libudev')
+dep_systemd = dependency('libsystemd')
 
 subdir('include')
 subdir('src')

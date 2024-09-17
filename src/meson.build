@@ -22,7 +22,7 @@ lib_eizo = library(
   'eizo', 
   src_eizo,
   dependencies : [
-    dep_udev,
+    dep_systemd,
   ],
   include_directories : inc,
   install : true,
