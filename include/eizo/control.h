@@ -336,13 +336,25 @@ enum eizo_split_display_mode : unsigned {
     EIZO_SPLIT_DISPLAY_MODE_PICTURE_IN_PICTURE = 2,
 };
 
-enum eizo_picture_by_picture_layout : unsigned {
-    EIZO_PICTURE_BY_PICTURE_LAYOUT_1 = 0,
-    EIZO_PICTURE_BY_PICTURE_LAYOUT_2 = 1,
-    EIZO_PICTURE_BY_PICTURE_LAYOUT_3 = 2,
-    EIZO_PICTURE_BY_PICTURE_LAYOUT_4 = 3,
-    EIZO_PICTURE_BY_PICTURE_LAYOUT_5 = 4,
-    EIZO_PICTURE_BY_PICTURE_LAYOUT_6 = 5,
+enum eizo_pbp_layout : unsigned {
+    EIZO_PBP_LAYOUT_1 = 0,
+    EIZO_PBP_LAYOUT_2 = 1,
+    EIZO_PBP_LAYOUT_3 = 2,
+    EIZO_PBP_LAYOUT_4 = 3,
+    EIZO_PBP_LAYOUT_5 = 4,
+    EIZO_PBP_LAYOUT_6 = 5,
+};
+
+enum eizo_pip_size : bool {
+    EIZO_PIP_SIZE_SMALL = false,
+    EIZO_PIP_SIZE_LARGE = true,
+};
+
+enum eizo_pip_position : unsigned {
+    EIZO_PIP_POSITION_UPPER_LEFT = 0,
+    EIZO_PIP_POSITION_LOWER_LEFT = 1,
+    EIZO_PIP_POSITION_UPPER_RIGHT = 2,
+    EIZO_PIP_POSITION_LOWER_RIGHT = 3,
 };
 
 enum eizo_button : unsigned {
