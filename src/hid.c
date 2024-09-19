@@ -302,7 +302,7 @@ enum eizo_result
 eizo_parse_descriptor(
     const uint8_t *desc,
     size_t desc_len,
-    struct eizo_control control[256],
+    struct eizo_control *control,
     size_t *control_len)
 {
     struct hid_item item;
