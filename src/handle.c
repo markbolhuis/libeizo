@@ -32,7 +32,7 @@ struct eizo_handle {
 };
 
 static enum eizo_result
-eizo_get_counter(struct eizo_handle *handle, uint16_t *counter) 
+eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
 {
     struct eizo_counter_report r = {};
     r.report_id = handle->rid.counter;
@@ -47,10 +47,7 @@ eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
 }
 
 static enum eizo_result
-eizo_get_serial_product(
-    struct eizo_handle *handle,
-    unsigned long *serial,
-    char product[17])
+eizo_get_serial_product(struct eizo_handle *handle, unsigned long *serial, char product[17])
 {
     char buf[25];
     buf[0] = (char)handle->rid.sn_prod;
@@ -76,18 +73,14 @@ eizo_get_serial_product(
     if (end == buf + 9) {
         *serial = sn;
     } else {
-        fprintf(stderr, "%s: failed to convert serial string to ulong.\n",
-                __func__);
+        fprintf(stderr, "%s: failed to convert serial string to ulong.\n", __func__);
     }
 
     return EIZO_SUCCESS;
 }
 
 enum eizo_result
-eizo_get_secondary_descriptor(
-    struct eizo_handle *handle,
-    uint8_t *dst,
-    int *size)
+eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst, int *size)
 {
     struct eizo_descriptor_report r = {};
     r.report_id = handle->rid.desc;
@@ -160,11 +153,7 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 }
 
 enum eizo_result
-eizo_get_value(
-    struct eizo_handle *handle,
-    enum eizo_usage usage,
-    uint8_t *value,
-    size_t len)
+eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
     struct eizo_value_report r = {};
     unsigned long cap;
@@ -200,11 +189,7 @@ eizo_get_value(
 }
 
 enum eizo_result
-eizo_set_value(
-    struct eizo_handle *handle,
-    enum eizo_usage usage,
-    uint8_t *value,
-    size_t len)
+eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
     struct eizo_value_report r = {};
     unsigned long cap;
@@ -449,8 +434,8 @@ err_open:
     return res;
 }
 
-void 
-eizo_close(struct eizo_handle *handle) 
+void
+eizo_close(struct eizo_handle *handle)
 {
     close(handle->fd);
     free(handle);

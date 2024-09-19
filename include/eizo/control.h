@@ -470,4 +470,4 @@ enum eizo_result
 eizo_set_debug_mode(eizo_handle_t handle, enum eizo_debug_mode mode);
 
 enum eizo_result
-eizo_set_osd_indicator(struct eizo_handle *handle, enum eizo_osd_indicator indicator);
+eizo_set_osd_indicator(eizo_handle_t handle, enum eizo_osd_indicator indicator);

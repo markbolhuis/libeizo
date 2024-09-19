@@ -88,7 +88,7 @@ eizo_enumerate(struct eizo_info *info, size_t *len);
 enum eizo_result
 eizo_open_hidraw(const char *path, eizo_handle_t *handle);
 
-void 
+void
 eizo_close(eizo_handle_t handle);
 
 enum eizo_pid
