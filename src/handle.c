@@ -7,6 +7,8 @@
 #include <sys/param.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <locale.h>
+#include <ctype.h>
 
 #include <linux/hidraw.h>
 #include <systemd/sd-device.h>
@@ -57,14 +59,16 @@ eizo_get_serial_product(struct eizo_handle *handle, unsigned long *serial, char 
         return EIZO_ERROR_IO;
     }
 
+    locale_t loc = newlocale(LC_CTYPE_MASK, "C", nullptr);
     int i;
     for (i = 0; i < 16; ++i) {
-        if (buf[9 + i] == ' ') {
+        if (!isalnum_l(buf[9 + i], loc)) {
             break;
         }
         product[i] = buf[9 + i];
     }
     product[i] = '\0';
+    freelocale(loc);
 
     buf[9] = '\0';
     char *end = nullptr;
