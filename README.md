@@ -6,9 +6,10 @@ It is currently in very early stages of development.
 ## eizoctl
 
 ```
-Usage: ./eizoctl <option>
+Usage: ./eizoctl <option> [monitor]
 
 Options:
+        list            - List all available monitors.
         identify        - Identify the monitor.
         poll            - Poll the monitor for events.
         descriptor      - Read the eizo specific HID report descriptor.

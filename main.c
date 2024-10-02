@@ -11,9 +11,10 @@
 void
 print_help()
 {
-    printf("Usage: ./eizoctl <option>\n");
+    printf("Usage: ./eizoctl <option> [monitor]\n");
     printf("\n");
     printf("Options:\n");
+    printf("\tlist            - List all available monitors.\n");
     printf("\tidentify        - Identify the monitor.\n");
     printf("\tpoll            - Poll the monitor for events.\n");
     printf("\tdescriptor      - Read the eizo specific HID report descriptor.\n");
@@ -39,16 +40,35 @@ main(int argc, const char *argv[])
         return EXIT_SUCCESS;
     }
 
-    struct eizo_info info[1];
-    size_t len = 1;
+    struct eizo_info info[4];
+    size_t len = 4;
     enum eizo_result res = eizo_enumerate(info, &len);
     if (res < EIZO_SUCCESS || len == 0) {
         return EXIT_FAILURE;
     }
 
+    if (strcmp(argv[1], "list") == 0) {
+        for (size_t i = 0; i < len; ++i) {
+            printf("%lu: %04x %s\n", i, info[i].pid, info[i].devnode);
+        }
+        return EXIT_SUCCESS;
+    }
+
+    const char *path;
+    if (argv[2]) {
+        char *end = nullptr;
+        size_t i = strtoul(argv[2], &end, 10);
+        if (i >= len || argv[2] + 1 != end) {
+            return EXIT_FAILURE;
+        }
+        path = info[i].devnode;
+    } else {
+        path = info[0].devnode;
+    }
+
     eizo_handle_t handle = nullptr;
-    res = eizo_open_hidraw(info[0].devnode, &handle);
-    if (res < EIZO_SUCCESS || handle == nullptr) {
+    res = eizo_open_hidraw(path, &handle);
+    if (res < EIZO_SUCCESS || !handle) {
         return EXIT_FAILURE;
     }
 
