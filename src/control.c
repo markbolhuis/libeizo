@@ -49,7 +49,7 @@ enum eizo_result
 eizo_set_brightness(struct eizo_handle *handle, int value)
 {
     if (value < 0 || value > 200) {
-        return EIZO_ERROR_INVALID_ARGUMENT;
+        return EIZO_ERROR_OUT_OF_RANGE;
     }
     return eizo_set_uint16(handle, EIZO_USAGE_BRIGHTNESS, (uint16_t)value);
 }
@@ -69,7 +69,7 @@ enum eizo_result
 eizo_set_contrast(struct eizo_handle *handle, int value)
 {
     if (value < 0 || value > 140) {
-        return EIZO_ERROR_INVALID_ARGUMENT;
+        return EIZO_ERROR_OUT_OF_RANGE;
     }
     return eizo_set_uint16(handle, EIZO_USAGE_CONTRAST, (uint16_t)value);
 }
@@ -81,10 +81,7 @@ eizo_get_usage_time(struct eizo_handle *handle, long *time)
         uint16_t hour;
         uint8_t buf[3];
     } u;
-    enum eizo_result res = eizo_get_value(
-        handle,
-        EIZO_USAGE_USAGE_TIME,
-        u.buf, 3);
+    enum eizo_result res = eizo_get_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);
     if (res >= EIZO_SUCCESS) {
         long t = (long)le16toh(u.hour);
         t *= 60;
@@ -98,7 +95,7 @@ enum eizo_result
 eizo_set_usage_time(struct eizo_handle *handle, long time)
 {
     if (time < 0) {
-        return EIZO_ERROR_INVALID_ARGUMENT;
+        return EIZO_ERROR_OUT_OF_RANGE;
     }
     union {
         uint16_t hour;
@@ -107,7 +104,7 @@ eizo_set_usage_time(struct eizo_handle *handle, long time)
     u.buf[2] = time % 60;
     time /= 60;
     if (time > UINT16_MAX) {
-        return EIZO_ERROR_INVALID_ARGUMENT;
+        return EIZO_ERROR_OUT_OF_RANGE;
     }
     u.hour = htole16(time);
     return eizo_set_value(handle, EIZO_USAGE_USAGE_TIME, u.buf, 3);

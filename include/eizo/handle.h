@@ -15,6 +15,7 @@ enum eizo_result : int {
     EIZO_ERROR_INVALID_USAGE = -6,
     EIZO_ERROR_NOT_PERMITTED = -7,
     EIZO_ERROR_BAD_DATA = -8,
+    EIZO_ERROR_OUT_OF_RANGE = -9,
 };
 
 enum : uint16_t {
