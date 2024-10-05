@@ -6,6 +6,7 @@ eizo_inc = [
 
 install_headers(
   eizo_inc,
-  preserve_path : true
+  preserve_path : true,
+  subdir : f'libeizo-@v_major@.@v_minor@'
 )
 

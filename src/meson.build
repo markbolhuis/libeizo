@@ -25,5 +25,6 @@ lib_eizo = library(
     dep_systemd,
   ],
   include_directories : inc,
+  version : v_str,
   install : true,
 )
