@@ -385,7 +385,8 @@ eizo_enumerate(struct eizo_info *info, size_t *len)
         ret = sd_device_get_devname(device, &path);
         if (ret >= 0) {
             info[i].pid = pid;
-            strncpy(info[i].devnode, path, 16);
+            strncpy(info[i].devnode, path, 15);
+            info[i].devnode[15] = '\0';
             ++i;
         }
     }
