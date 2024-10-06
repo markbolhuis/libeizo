@@ -32,15 +32,26 @@ eizo_print_hex(uint8_t *data, size_t size)
 void
 eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
 {
-    uint8_t desc[HID_MAX_DESCRIPTOR_SIZE];
-    size_t size = 0;
-    enum eizo_result res = eizo_get_secondary_descriptor(handle, desc, &size);
-    if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: reading the descriptor failed %d.\n", __func__, res);
+    const struct eizo_control *ctrl = nullptr;
+    size_t n = eizo_get_controls(handle, &ctrl);
+    if (n == 0) {
         return;
     }
 
-    eizo_print_descriptor(desc, size);
+    for (size_t i = 0; i < n; ++i) {
+        const char *ustr = eizo_usage_to_string(ctrl[i].usage);
+        if (!ustr) {
+            ustr = "?";
+        }
+        printf("%3u | 0x%08x | %-40s | %4u | %5u | %11i | %11i |\n",
+               ctrl[i].report_id,
+               ctrl[i].usage,
+               ustr,
+               ctrl[i].report_size,
+               ctrl[i].report_count,
+               ctrl[i].logical_minimum,
+               ctrl[i].logical_maximum);
+    }
 }
 
 void
@@ -283,27 +294,41 @@ eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
 void
 eizo_dbg_dump_all_usages(struct eizo_handle *handle)
 {
-    uint8_t buf[32];
+    uint8_t buf[512];
 
-    for (uint32_t page = 0xff00; page < 0xff03; ++page) {
-        for (uint32_t id = 0; id < 256; ++id) {
-            uint32_t usage = page << 16 | id;
-            printf("0x%08x: ", usage);
+    const struct eizo_control *ctrl = nullptr;
+    size_t n = eizo_get_controls(handle, &ctrl);
 
-            memset(buf, 0, 32);
-            enum eizo_result res = eizo_get_value(handle, usage, buf, 32);
-            if (res < EIZO_SUCCESS) {
-                printf("error %d\n", res);
-                continue;
-            }
-
-            for (int i = 0; i < 32; ++i) {
-                printf("%02x", buf[i]);
-            }
-
-            printf("\n");
-            usleep(10000);
+    for (size_t i = 0; i < n; ++i) {
+        if (ctrl[i].report_size % 8 != 0) {
+            continue;
         }
+
+        size_t len = (ctrl[i].report_size / 8) * ctrl[i].report_count;
+        if (len > 512 || len == 0) {
+            continue;
+        }
+
+        const char *ustr = eizo_usage_to_string(ctrl[i].usage);
+        if (!ustr) {
+            ustr = "?";
+        }
+
+        printf("%08x | %-40s | ", ctrl[i].usage, ustr);
+
+        memset(buf, 0, len);
+        enum eizo_result res = eizo_get_value(handle, ctrl[i].usage, buf, len);
+        if (res < EIZO_SUCCESS) {
+            printf("error %d\n", res);
+            continue;
+        }
+
+        for (size_t j = 0; j < len; ++j) {
+            printf("%02x", buf[j]);
+        }
+
+        printf("\n");
+        usleep(10000);
     }
 }
 

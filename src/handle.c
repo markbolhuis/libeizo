@@ -22,6 +22,8 @@ struct eizo_handle {
     enum eizo_pid pid;
     unsigned long serial;
     char product[17];
+    struct eizo_control *ctrl;
+    size_t n_ctrl;
     struct {
         uint8_t desc;
         uint8_t set[2];
@@ -32,6 +34,42 @@ struct eizo_handle {
         uint8_t key_value;
     } rid;
 };
+
+static int
+eizo_control_compare_by_usage(const void *a, const void *b)
+{
+    const struct eizo_control *c1 = a, *c2 = b;
+    if (c1->usage > c2->usage) {
+        return 1;
+    }
+    if (c1->usage < c2->usage) {
+        return -1;
+    }
+    return 0;
+}
+
+size_t
+eizo_get_controls(struct eizo_handle *handle, const struct eizo_control **ctrl)
+{
+    if (ctrl) {
+        *ctrl = handle->ctrl;
+    }
+    return handle->n_ctrl;
+}
+
+struct eizo_control *
+eizo_control_find(struct eizo_handle *handle, enum eizo_usage usage)
+{
+    struct eizo_control key = {
+        .usage = usage,
+    };
+    return bsearch(
+        &key,
+        handle->ctrl,
+        handle->n_ctrl,
+        sizeof(struct eizo_control),
+        eizo_control_compare_by_usage);
+}
 
 static enum eizo_result
 eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
@@ -162,6 +200,12 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 enum eizo_result
 eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
+    struct eizo_control *ctrl = eizo_control_find(handle, usage);
+    if (!ctrl) {
+        fprintf(stderr, "%s: monitor does not support usage 0x%08x\n", __func__, usage);
+        return EIZO_ERROR_INVALID_USAGE;
+    }
+
     struct eizo_value_report r = {};
     unsigned long cap;
 
@@ -198,6 +242,12 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 enum eizo_result
 eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
+    struct eizo_control *ctrl = eizo_control_find(handle, usage);
+    if (!ctrl) {
+        fprintf(stderr, "%s: monitor does not support usage 0x%08x\n", __func__, usage);
+        return EIZO_ERROR_INVALID_USAGE;
+    }
+
     struct eizo_value_report r = {};
     unsigned long cap;
 
@@ -339,6 +389,41 @@ eizo_parse_hidraw_devinfo(struct eizo_handle *handle)
     return EIZO_SUCCESS;
 }
 
+static enum eizo_result
+eizo_parse_secondary_descriptor(struct eizo_handle *handle)
+{
+    uint8_t desc[HID_MAX_DESCRIPTOR_SIZE];
+    size_t len = 0;
+    enum eizo_result res = eizo_get_secondary_descriptor(handle, desc, &len);
+    if (res < EIZO_SUCCESS) {
+        return res;
+    }
+
+    size_t n_ctrl = 256;
+    struct eizo_control *ctrl_max = calloc(n_ctrl, sizeof(struct eizo_control));
+    if (!ctrl_max) {
+        return EIZO_ERROR_NO_MEMORY;
+    }
+
+    res = eizo_parse_descriptor(desc, len, ctrl_max, &n_ctrl);
+    if (res < EIZO_SUCCESS) {
+        free(ctrl_max);
+        return res;
+    }
+
+    struct eizo_control *ctrl = reallocarray(ctrl_max, n_ctrl, sizeof(struct eizo_control));
+    if (!ctrl) {
+        free(ctrl_max);
+        return EIZO_ERROR_NO_MEMORY;
+    }
+
+    qsort(ctrl, n_ctrl, sizeof(struct eizo_control), eizo_control_compare_by_usage);
+
+    handle->n_ctrl = n_ctrl;
+    handle->ctrl = ctrl;
+    return EIZO_SUCCESS;
+}
+
 enum eizo_result
 eizo_enumerate(struct eizo_info *info, size_t *len)
 {
@@ -418,20 +503,29 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
         goto err_open;
     }
 
-    res = eizo_parse_hidraw_devinfo(h);
-    if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: Failed to read hidraw devinfo. %d\n", __func__, res);
-        goto err_hidraw;
+#define err_check(res, msg) \
+    if ((res) < EIZO_SUCCESS) { \
+        fprintf(stderr, "%s: " msg " %d\n", __func__, res); \
+        goto err_hidraw; \
     }
+
+    res = eizo_parse_hidraw_devinfo(h);
+    err_check(res, "Failed to read hidraw devinfo.");
 
     res = eizo_parse_hidraw_descriptor(h);
-    if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: Failed to read hidraw descriptor. %d\n", __func__, res);
-        goto err_hidraw;
-    }
+    err_check(res, "Failed to read hidraw descriptor.");
 
-    eizo_get_counter(h, &h->counter);
-    eizo_get_serial_product(h, &h->serial, h->product);
+    res = eizo_get_counter(h, &h->counter);
+    err_check(res, "Failed to read eizo handle counter.");
+
+    res = eizo_get_serial_product(h, &h->serial, h->product);
+    err_check(res, "Failed to read eizo serial/product string.");
+
+    res = eizo_parse_secondary_descriptor(h);
+    err_check(res, "Failed to parse eizo secondary report descriptor.");
+
+#undef eizo_check
+
     *handle = h;
     return EIZO_SUCCESS;
 
@@ -445,6 +539,9 @@ err_open:
 void
 eizo_close(struct eizo_handle *handle)
 {
+    if (handle->ctrl) {
+        free(handle->ctrl);
+    }
     close(handle->fd);
     free(handle);
 }

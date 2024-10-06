@@ -359,31 +359,3 @@ eizo_parse_descriptor(
     *control_len = i;
     return EIZO_SUCCESS;
 }
-
-void
-eizo_print_descriptor(const uint8_t *desc, size_t len)
-{
-    struct eizo_control control[256];
-
-    size_t clen = 256;
-    enum eizo_result res = eizo_parse_descriptor(desc, len, control, &clen);
-    if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: Failed to parse descriptor %d\n", __func__, res);
-        return;
-    }
-
-    for (size_t i = 0; i < clen; ++i) {
-        const char *ustr = eizo_usage_to_string(control[i].usage);
-        if (ustr == nullptr) {
-            ustr = "?";
-        }
-        printf("%3u | 0x%08x | %-40s | %4u | %5u | %11i | %11i |\n",
-               control[i].report_id,
-               control[i].usage,
-               ustr,
-               control[i].report_size,
-               control[i].report_count,
-               control[i].logical_minimum,
-               control[i].logical_maximum);
-    }
-}
