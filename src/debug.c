@@ -33,14 +33,14 @@ void
 eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
 {
     uint8_t desc[HID_MAX_DESCRIPTOR_SIZE];
-    int size = -1;
+    size_t size = 0;
     enum eizo_result res = eizo_get_secondary_descriptor(handle, desc, &size);
     if (res < EIZO_SUCCESS) {
         fprintf(stderr, "%s: reading the descriptor failed %d.\n", __func__, res);
         return;
     }
 
-    eizo_print_descriptor(desc, (size_t)size);
+    eizo_print_descriptor(desc, size);
 }
 
 void

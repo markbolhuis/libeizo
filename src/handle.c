@@ -84,7 +84,7 @@ eizo_get_serial_product(struct eizo_handle *handle, unsigned long *serial, char 
 }
 
 enum eizo_result
-eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst, int *size)
+eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst, size_t *size)
 {
     struct eizo_descriptor_report r = {};
     r.report_id = handle->rid.desc;
@@ -94,39 +94,42 @@ eizo_get_secondary_descriptor(struct eizo_handle *handle, uint8_t *dst, int *siz
         return EIZO_ERROR_IO;
     }
 
-    uint16_t desc_len = 0, pos = 0;
+    size_t desc_len = 0, pos = 0;
     do {
         rc = ioctl(handle->fd, HIDIOCGFEATURE(517), &r);
         if (rc < 0) {
             return EIZO_ERROR_IO;
         }
 
-        uint16_t offset = le16toh(r.offset);
-        uint16_t len    = le16toh(r.length);
+        size_t offset = le16toh(r.offset);
+        size_t len    = le16toh(r.length);
 
         if (offset != pos) {
-            fprintf(stderr, "%s: Invalid offset %u != %u.\n", __func__, offset, pos);
+            fprintf(stderr, "%s: Invalid offset %zu != %zu.\n", __func__, offset, pos);
             return EIZO_ERROR_BAD_DATA;
         }
 
         if (desc_len == 0) {
             if (len > HID_MAX_DESCRIPTOR_SIZE || len == 0) {
-                fprintf(stderr, "%s: Invalid descriptor size %u.\n", __func__, len);
+                fprintf(stderr, "%s: Invalid descriptor size %zu.\n", __func__, len);
                 return EIZO_ERROR_BAD_DATA;
             }
             desc_len = len;
         } else if (desc_len != len) {
-            fprintf(stderr, "%s: Invalid length %u at position %u.\n", __func__, len, pos);
+            fprintf(stderr, "%s: Invalid length %zu at position %zu.\n", __func__, len, pos);
             return EIZO_ERROR_BAD_DATA;
         }
 
-        uint16_t cpy = MIN(desc_len - pos, 512);
+        size_t cpy = desc_len - pos;
+        if (cpy > 512) {
+            cpy = 512;
+        }
         memcpy(dst + pos, r.desc, cpy);
 
         pos += 512;
     } while (pos < desc_len);
 
-    *size = (int)desc_len;
+    *size = desc_len;
     return EIZO_SUCCESS;
 }
 
