@@ -368,8 +368,11 @@ eizo_swap_usage(uint32_t value)
 #endif
 }
 
+const struct eizo_control *
+eizo_control_find(const struct eizo_handle *handle, enum eizo_usage usage);
+
 size_t
-eizo_get_controls(struct eizo_handle *handle, const struct eizo_control **ctrl);
+eizo_get_controls(const struct eizo_handle *handle, const struct eizo_control **ctrl);
 
 const char *
 eizo_usage_to_string(enum eizo_usage usage);

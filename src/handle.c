@@ -49,7 +49,7 @@ eizo_control_compare_by_usage(const void *a, const void *b)
 }
 
 size_t
-eizo_get_controls(struct eizo_handle *handle, const struct eizo_control **ctrl)
+eizo_get_controls(const struct eizo_handle *handle, const struct eizo_control **ctrl)
 {
     if (ctrl) {
         *ctrl = handle->ctrl;
@@ -57,8 +57,8 @@ eizo_get_controls(struct eizo_handle *handle, const struct eizo_control **ctrl)
     return handle->n_ctrl;
 }
 
-struct eizo_control *
-eizo_control_find(struct eizo_handle *handle, enum eizo_usage usage)
+const struct eizo_control *
+eizo_control_find(const struct eizo_handle *handle, enum eizo_usage usage)
 {
     struct eizo_control key = {
         .usage = usage,
@@ -200,7 +200,7 @@ eizo_verify(struct eizo_handle *handle, enum eizo_usage usage)
 enum eizo_result
 eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
-    struct eizo_control *ctrl = eizo_control_find(handle, usage);
+    const struct eizo_control *ctrl = eizo_control_find(handle, usage);
     if (!ctrl) {
         fprintf(stderr, "%s: monitor does not support usage 0x%08x\n", __func__, usage);
         return EIZO_ERROR_INVALID_USAGE;
@@ -242,7 +242,7 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 enum eizo_result
 eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value, size_t len)
 {
-    struct eizo_control *ctrl = eizo_control_find(handle, usage);
+    const struct eizo_control *ctrl = eizo_control_find(handle, usage);
     if (!ctrl) {
         fprintf(stderr, "%s: monitor does not support usage 0x%08x\n", __func__, usage);
         return EIZO_ERROR_INVALID_USAGE;
