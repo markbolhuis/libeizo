@@ -356,16 +356,24 @@ eizo_dbg_poll(struct eizo_handle *handle)
                 enum eizo_usage usage = eizo_swap_usage(r.usage);
                 uint16_t counter = le16toh(r.counter);
 
+                size_t len = (size_t)n - 7;
+
+                const struct eizo_control *ctrl = eizo_control_find(handle, usage);
+                if (ctrl && ctrl->report_size % 8 == 0) {
+                    uint32_t q = (ctrl->report_size / 8) * ctrl->report_count;
+                    if (q > 0 && q <= 512) {
+                        len = (size_t)q;
+                    }
+                }
+
                 const char *ustr = eizo_usage_to_string(usage);
-                if (ustr == nullptr) {
+                if (!ustr) {
                     printf("%3u %3u %-20x ", r.report_id, counter, usage);
                 } else {
                     printf("%3u %3u %-20s ", r.report_id, counter, ustr);
                 }
 
-                n -= 7;
-
-                for (ssize_t i = 0; i < n; ++i) {
+                for (size_t i = 0; i < len; ++i) {
                     printf("%02x", r.value[i]);
                 }
                 printf("\n");
