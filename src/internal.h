@@ -8,7 +8,7 @@ struct eizo_handle;
 enum eizo_result : int;
 
 // Assume 256 bytes for now, which seems to be the limit for this report.
-#define EIZO_FF300009_MAX_SIZE 256
+constexpr size_t EIZO_FF300009_MAX_SIZE = 256;
 
 enum eizo_ff300009_key : uint8_t {
     EIZO_FF300009_KEY_RESOLUTION = 0x4c,
