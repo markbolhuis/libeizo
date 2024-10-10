@@ -18,9 +18,7 @@ enum eizo_result : int {
     EIZO_ERROR_OUT_OF_RANGE = -9,
 };
 
-enum : uint16_t {
-    EIZO_VID = 0x056d,
-};
+constexpr uint16_t EIZO_VID = 0x056d;
 
 enum eizo_pid : uint16_t {
     EIZO_PID_FLEXSCAN_EV3237 = 0x4000,
