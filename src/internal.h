@@ -344,7 +344,7 @@ struct [[gnu::packed]] eizo_verify_report {
     uint32_t usage;
     uint16_t counter;
     uint8_t  result;
-} ;
+};
 static_assert(sizeof(struct eizo_verify_report) == 8);
 
 struct eizo_control {

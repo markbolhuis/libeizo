@@ -17,14 +17,14 @@
 static void
 eizo_print_hex(uint8_t *data, size_t size)
 {
-    printf("size %lu", size);
+    printf("size %zu", size);
     for (size_t i = 0; i < size; ++i) {
         if (i % 16 == 0) {
             printf("\n");
         } else {
             printf(" ");
         }
-        printf("%02x", data[i]);
+        printf("%02w8x", data[i]);
     }
     printf("\n");
 }
@@ -43,7 +43,7 @@ eizo_dbg_dump_secondary_descriptor(struct eizo_handle *handle)
         if (!ustr) {
             ustr = "?";
         }
-        printf("%3u | 0x%08x | %-40s | %4u | %5u | %11i | %11i |\n",
+        printf("%3w32u | %08w32x | %-40s | %4w32u | %5w32u | %11w32i | %11w32i |\n",
                ctrl[i].report_id,
                ctrl[i].usage,
                ustr,
@@ -65,26 +65,26 @@ eizo_dbg_dump_ff300009(struct eizo_handle *handle)
         return;
     }
 
-    printf("ff300009 size: %d\n", size);
+    printf("ff300009 size: %i\n", size);
 
     int i = 0;
     while (i < size) {
         enum eizo_ff300009_key key = info[i++];
-        printf("%02x", key);
+        printf("%02w8x", key);
         if (key == EIZO_FF300009_KEY_END || i == size) {
             printf("\n");
             break;
         }
 
         int len = info[i++];
-        printf(" %02x", len);
+        printf(" %02w8x", len);
 
         if ((i + len) > size) {
             len = size - i;
         }
 
         for (int j = i; j < (i + len); ++j) {
-            printf(" %02x", info[j]);
+            printf(" %02w8x", info[j]);
         }
 
         printf("\n");
@@ -105,20 +105,15 @@ eizo_dbg_dump_eeprom(struct eizo_handle *handle)
 
     for (uint16_t i = 0; i < EEP_SIZE; ++i) {
         u.value = htole16(i);
-        enum eizo_result res = eizo_set_value(
-            handle,
-            EIZO_USAGE_EEPROM_ADDRESS,
-            u.buf, 2);
+        enum eizo_result res = eizo_set_value(handle, EIZO_USAGE_EEPROM_ADDRESS, u.buf, 2);
         if (res < EIZO_SUCCESS) {
-            fprintf(stderr, "%s: Failed to set eep address %u.\n",
-                    __func__, i);
+            fprintf(stderr, "%s: Failed to set eep address %w16u.\n", __func__, i);
             return;
         }
 
         res = eizo_get_value(handle, EIZO_USAGE_EEPROM_DATA, u.buf, 2);
         if (res < EIZO_SUCCESS) {
-            fprintf(stderr, "%s: Failed to get eep data at address %u.\n",
-                    __func__, i);
+            fprintf(stderr, "%s: Failed to get eep data at address %w16u.\n", __func__, i);
             return;
         }
         buf[i] = (uint8_t)le16toh(u.value);
@@ -141,7 +136,7 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
         return;
     }
 
-    printf("available custom key lock size: %ld\n", size);
+    printf("available custom key lock size: %zu\n", size);
     size_t i = 0;
     while (i < (size - 2)) {
         uint32_t key = 0;
@@ -149,21 +144,21 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
         key |= data[i++] << 8;
         key |= data[i++];
 
-        printf("0x%06x", key);
+        printf("0x%06w32x", key);
         if (i >= size) {
             printf("\n");
             break;
         }
 
         size_t len = data[i++];
-        printf(" %3ld", len);
+        printf(" %3zu", len);
 
         if ((i + len) > size) {
             len = size - i;
         }
 
         for (size_t j = i; j < (i + len); ++j) {
-            printf(" %02x", data[j]);
+            printf(" %02w8x", data[j]);
         }
 
         printf("\n");
@@ -172,7 +167,7 @@ eizo_dbg_dump_available_custom_key_lock(struct eizo_handle *handle)
     if (i < size) {
         printf("Rem:");
         for (size_t j = i; j < size; ++j) {
-            printf(" %02x", data[j]);
+            printf(" %02w8x", data[j]);
         }
         printf("\n");
     }
@@ -193,11 +188,11 @@ eizo_dbg_dump_custom_key_lock(struct eizo_handle *handle)
 
     enum eizo_result res = eizo_get_value(handle, EIZO_USAGE_EV_CUSTOM_KEY_LOCK, u.buf, 6);
     if (res != EIZO_SUCCESS) {
-        fprintf(stderr, "%s: %d\n", __func__, res);
+        fprintf(stderr, "%s: %i\n", __func__, res);
         return;
     }
 
-    printf("custom key lock used: 0x%06x %u\n", be32toh(u.var1), le16toh(u.var2));
+    printf("custom key lock used: 0x%06w32x %w16u\n", be32toh(u.var1), le16toh(u.var2));
 }
 
 void
@@ -213,7 +208,7 @@ eizo_dbg_dump_ff01010e(struct eizo_handle *handle)
         return;
     }
 
-    printf("ff01010d: %08x\n", le32toh(u.value));
+    printf("ff01010d: %08w32x\n", le32toh(u.value));
 
     res = eizo_get_value(handle, 0xff01010e, u.buf, 512);
     if (res < EIZO_SUCCESS) {
@@ -254,7 +249,7 @@ eizo_dbg_dump_ff020059(struct eizo_handle *handle)
 
     printf("ff020059\n");
     for (int i = 0; i < 256; ++i) {
-        printf("%d: %u\n", i, le16toh(u.u16[i]));
+        printf("%i: %w16u\n", i, le16toh(u.u16[i]));
     }
 }
 
@@ -267,7 +262,7 @@ eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
     if (res < EIZO_SUCCESS) {
         return;
     }
-    printf("gain definition: %u\n", def[0]);
+    printf("gain definition: %w8u\n", def[0]);
 
     res = eizo_get_value(handle, EIZO_USAGE_GAIN_DEFINITION_DATA, def, 75);
     if (res < EIZO_SUCCESS) {
@@ -287,7 +282,7 @@ eizo_dbg_dump_gain_definition(struct eizo_handle *handle)
         color |= def[i * 3 + 1] << 8;
         color |= def[i * 3 + 2];
 
-        printf("%-7s#%06x\n", names[i], color);
+        printf("%-7s#%06w32x\n", names[i], color);
     }
 }
 
@@ -314,17 +309,17 @@ eizo_dbg_dump_all_usages(struct eizo_handle *handle)
             ustr = "?";
         }
 
-        printf("%08x | %-40s | ", ctrl[i].usage, ustr);
+        printf("%08w32x | %-40s | ", ctrl[i].usage, ustr);
 
         memset(buf, 0, len);
         enum eizo_result res = eizo_get_value(handle, ctrl[i].usage, buf, len);
         if (res < EIZO_SUCCESS) {
-            printf("error %d\n", res);
+            printf("error %i\n", res);
             continue;
         }
 
         for (size_t j = 0; j < len; ++j) {
-            printf("%02x", buf[j]);
+            printf("%02w8x", buf[j]);
         }
 
         printf("\n");
@@ -368,13 +363,13 @@ eizo_dbg_poll(struct eizo_handle *handle)
 
                 const char *ustr = eizo_usage_to_string(usage);
                 if (!ustr) {
-                    printf("%3u %3u %-20x ", r.report_id, counter, usage);
+                    printf("%3w8u %3w16u %-20x ", r.report_id, counter, usage);
                 } else {
-                    printf("%3u %3u %-20s ", r.report_id, counter, ustr);
+                    printf("%3w8u %3w16u %-20s ", r.report_id, counter, ustr);
                 }
 
                 for (size_t i = 0; i < len; ++i) {
-                    printf("%02x", r.value[i]);
+                    printf("%02w8x", r.value[i]);
                 }
                 printf("\n");
             } else {

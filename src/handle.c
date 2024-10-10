@@ -202,7 +202,7 @@ eizo_get_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 {
     const struct eizo_control *ctrl = eizo_control_find(handle, usage);
     if (!ctrl) {
-        fprintf(stderr, "%s: monitor does not support usage 0x%08x\n", __func__, usage);
+        fprintf(stderr, "%s: monitor does not support usage %08w32x\n", __func__, usage);
         return EIZO_ERROR_INVALID_USAGE;
     }
 
@@ -244,7 +244,7 @@ eizo_set_value(struct eizo_handle *handle, enum eizo_usage usage, uint8_t *value
 {
     const struct eizo_control *ctrl = eizo_control_find(handle, usage);
     if (!ctrl) {
-        fprintf(stderr, "%s: monitor does not support usage 0x%08x\n", __func__, usage);
+        fprintf(stderr, "%s: monitor does not support usage %08w32x\n", __func__, usage);
         return EIZO_ERROR_INVALID_USAGE;
     }
 
@@ -315,7 +315,7 @@ eizo_parse_hidraw_descriptor(struct eizo_handle *handle)
 
     res = eizo_parse_descriptor(desc.value, desc.size, control, &clen);
     if (res < EIZO_SUCCESS) {
-        fprintf(stderr, "%s: failed to parse descriptor. %d\n", __func__, res);
+        fprintf(stderr, "%s: failed to parse descriptor. %i\n", __func__, res);
         return res;
     }
 
@@ -505,7 +505,7 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
 
 #define err_check(res, msg) \
     if ((res) < EIZO_SUCCESS) { \
-        fprintf(stderr, "%s: " msg " %d\n", __func__, res); \
+        fprintf(stderr, "%s: " msg " %i\n", __func__, res); \
         goto err_hidraw; \
     }
 
@@ -524,7 +524,7 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
     res = eizo_parse_secondary_descriptor(h);
     err_check(res, "Failed to parse eizo secondary report descriptor.");
 
-#undef eizo_check
+#undef err_check
 
     *handle = h;
     return EIZO_SUCCESS;
