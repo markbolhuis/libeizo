@@ -411,6 +411,11 @@ eizo_parse_secondary_descriptor(struct eizo_handle *handle)
         return res;
     }
 
+    if (n_ctrl == 0) {
+        free(ctrl_max);
+        return EIZO_ERROR_BAD_DATA;
+    }
+
     struct eizo_control *ctrl = reallocarray(ctrl_max, n_ctrl, sizeof(struct eizo_control));
     if (!ctrl) {
         free(ctrl_max);
