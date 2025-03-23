@@ -11,7 +11,6 @@
 #include <ctype.h>
 
 #include <linux/hidraw.h>
-#include <systemd/sd-device.h>
 
 #include "eizo/handle.h"
 #include "internal.h"
@@ -430,83 +429,14 @@ eizo_parse_secondary_descriptor(struct eizo_handle *handle)
 }
 
 enum eizo_result
-eizo_enumerate(struct eizo_info *info, size_t *len)
-{
-    enum eizo_result res = EIZO_ERROR_UNKNOWN;
-
-    struct sd_device_enumerator *enumerator = nullptr;
-    int ret = sd_device_enumerator_new(&enumerator);
-    if (ret < 0) {
-        return res;
-    }
-
-    ret = sd_device_enumerator_add_match_subsystem(enumerator, "hidraw", 1);
-    if (ret < 0) {
-        goto exit;
-    }
-
-    size_t i = 0;
-    for (struct sd_device *device = sd_device_enumerator_get_device_first(enumerator);
-         device;
-         device = sd_device_enumerator_get_device_next(enumerator))
-    {
-        struct sd_device *parent = nullptr;
-        ret = sd_device_get_parent_with_subsystem_devtype(device, "usb", "usb_device", &parent);
-        if (ret < 0) {
-            continue;
-        }
-
-        const char *vid_str = nullptr, *pid_str = nullptr;
-        int rv = sd_device_get_sysattr_value(parent, "idVendor", &vid_str);
-        int rp = sd_device_get_sysattr_value(parent, "idProduct", &pid_str);
-        if (rv < 0 || rp < 0) {
-            continue;
-        }
-
-        unsigned long vid = strtoul(vid_str, nullptr, 16);
-        unsigned long pid = strtoul(pid_str, nullptr, 16);
-        if (vid != EIZO_VID) {
-            continue;
-        }
-
-        if (i >= *len) {
-            res = EIZO_INCOMPLETE;
-            goto exit;
-        }
-
-        const char *path = nullptr;
-        ret = sd_device_get_devname(device, &path);
-        if (ret >= 0) {
-            info[i].pid = pid;
-            strncpy(info[i].devnode, path, 15);
-            info[i].devnode[15] = '\0';
-            ++i;
-        }
-    }
-
-    res = EIZO_SUCCESS;
-    *len = i;
-exit:
-    sd_device_enumerator_unref(enumerator);
-    return res;
-}
-
-enum eizo_result
-eizo_open_hidraw(const char *path, struct eizo_handle **handle)
+eizo_new(const int fd, struct eizo_handle **handle)
 {
     struct eizo_handle *h = calloc(1, sizeof *h);
     if (!h) {
         return EIZO_ERROR_NO_MEMORY;
     }
 
-    enum eizo_result res;
-
-    h->fd = open(path, O_RDWR | O_CLOEXEC);
-    if (h->fd < 0) {
-        fprintf(stderr, "%s: Failed to open %s. %s\n", __func__, path, strerror(errno));
-        res = EIZO_ERROR_IO;
-        goto err_open;
-    }
+    h->fd = fd;
 
 #define err_check(res, msg) \
     if ((res) < EIZO_SUCCESS) { \
@@ -514,7 +444,7 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
         goto err_hidraw; \
     }
 
-    res = eizo_parse_hidraw_devinfo(h);
+    enum eizo_result res = eizo_parse_hidraw_devinfo(h);
     err_check(res, "Failed to read hidraw devinfo.");
 
     res = eizo_parse_hidraw_descriptor(h);
@@ -536,7 +466,6 @@ eizo_open_hidraw(const char *path, struct eizo_handle **handle)
 
 err_hidraw:
     close(h->fd);
-err_open:
     free(h);
     return res;
 }

@@ -3,6 +3,9 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <limits.h>
+
+#include <systemd/sd-device.h>
 
 #include "eizo/handle.h"
 #include "eizo/debug.h"
@@ -28,6 +31,67 @@ print_help()
     printf("\thelp            - Show this help message.\n");
 }
 
+struct sd_device *
+enumerate(const int n)
+{
+    [[gnu::cleanup(sd_device_enumerator_unrefp)]]
+    sd_device_enumerator *enumerator = nullptr;
+
+    int ret = sd_device_enumerator_new(&enumerator);
+    if (ret < 0) {
+        return nullptr;
+    }
+
+    ret = sd_device_enumerator_add_match_subsystem(enumerator, "hidraw", true);
+    if (ret < 0) {
+        return nullptr;
+    }
+
+    int i = 0;
+    for (sd_device *device = sd_device_enumerator_get_device_first(enumerator);
+         device;
+         device = sd_device_enumerator_get_device_next(enumerator))
+    {
+        sd_device *parent = nullptr;
+        ret = sd_device_get_parent_with_subsystem_devtype(
+                device,
+                "usb",
+                "usb_device",
+                &parent);
+        if (ret < 0) {
+            continue;
+        }
+
+        const char *vid_str = nullptr, *pid_str = nullptr;
+        int rv = sd_device_get_sysattr_value(parent, "idVendor", &vid_str);
+        int rp = sd_device_get_sysattr_value(parent, "idProduct", &pid_str);
+        if (rv < 0 || rp < 0) {
+            continue;
+        }
+
+        unsigned long vid = strtoul(vid_str, nullptr, 16);
+        unsigned long pid = strtoul(pid_str, nullptr, 16);
+        if (vid != EIZO_VID) {
+            continue;
+        }
+
+        if (n < 0) {
+            const char *devname = nullptr;
+            ret = sd_device_get_devname(device, &devname);
+            if (ret >= 0) {
+                printf("%i: %s %04lx\n", i, devname, pid);
+            }
+        } else {
+            if (i == n) {
+                return sd_device_ref(device);
+            }
+            ++i;
+        }
+    }
+
+    return nullptr;
+}
+
 int
 main(int argc, const char *argv[]) 
 {
@@ -40,34 +104,37 @@ main(int argc, const char *argv[])
         return EXIT_SUCCESS;
     }
 
-    struct eizo_info info[4];
-    size_t len = 4;
-    enum eizo_result res = eizo_enumerate(info, &len);
-    if (res < EIZO_SUCCESS || len == 0) {
-        return EXIT_FAILURE;
-    }
-
     if (strcmp(argv[1], "list") == 0) {
-        for (size_t i = 0; i < len; ++i) {
-            printf("%lu: %04x %s\n", i, info[i].pid, info[i].devnode);
-        }
+        enumerate(-1);
         return EXIT_SUCCESS;
     }
 
-    const char *path;
+    int i = 0;
     if (argv[2]) {
         char *end = nullptr;
-        size_t i = strtoul(argv[2], &end, 10);
-        if (i >= len || argv[2] + 1 != end) {
+        unsigned long u = strtoul(argv[2], &end, 10);
+        if (u > INT_MAX) {
+            fprintf(stderr, "Invalid value for 'monitor'\n");
             return EXIT_FAILURE;
         }
-        path = info[i].devnode;
-    } else {
-        path = info[0].devnode;
+        i = (int) u;
+    }
+
+    [[gnu::cleanup(sd_device_unrefp)]]
+    sd_device *device = enumerate(i);
+    if (!device) {
+        fprintf(stderr, "Device not found.\n");
+        return EXIT_FAILURE;
+    }
+
+    const int fd = sd_device_open(device, 0);
+    if (fd < 0) {
+        fprintf(stderr, "Failed to open device. %s\n", strerror(-fd));
+        return EXIT_FAILURE;
     }
 
     eizo_handle_t handle = nullptr;
-    res = eizo_open_hidraw(path, &handle);
+    enum eizo_result res = eizo_new(fd, &handle);
     if (res < EIZO_SUCCESS || !handle) {
         return EXIT_FAILURE;
     }

@@ -77,16 +77,8 @@ enum eizo_pid : uint16_t {
     // EIZO_PID_COLOREDGE_CX271
 };
 
-struct eizo_info {
-    char devnode[16];
-    enum eizo_pid pid;
-};
-
 enum eizo_result
-eizo_enumerate(struct eizo_info *info, size_t *len);
-
-enum eizo_result
-eizo_open_hidraw(const char *path, eizo_handle_t *handle);
+eizo_new(int fd, eizo_handle_t *handle);
 
 void
 eizo_close(eizo_handle_t handle);

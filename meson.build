@@ -25,6 +25,7 @@ subdir('src')
 executable('eizoctl', 'main.c',
   link_with : lib_eizo,
   include_directories : inc,
+  dependencies : [dep_systemd],
   install : true,
 )
 

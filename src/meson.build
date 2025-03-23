@@ -21,9 +21,6 @@ src_eizo = [
 lib_eizo = library(
   'eizo', 
   src_eizo,
-  dependencies : [
-    dep_systemd,
-  ],
   include_directories : inc,
   version : v_str,
   install : true,
