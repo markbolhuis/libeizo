@@ -429,6 +429,16 @@ eizo_parse_secondary_descriptor(struct eizo_handle *handle)
 }
 
 enum eizo_result
+eizo_open(const char *hidraw, struct eizo_handle **handle)
+{
+    int fd = open(hidraw, O_RDWR | O_CLOEXEC);
+    if (fd < 0)
+        return EIZO_ERROR_IO;
+
+    return eizo_new(fd, handle);
+}
+
+enum eizo_result
 eizo_new(const int fd, struct eizo_handle **handle)
 {
     struct eizo_handle *h = calloc(1, sizeof *h);

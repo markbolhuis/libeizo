@@ -85,8 +85,8 @@ enumerate(const int n)
             if (i == n) {
                 return sd_device_ref(device);
             }
-            ++i;
         }
+        ++i;
     }
 
     return nullptr;
