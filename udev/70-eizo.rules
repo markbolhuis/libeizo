@@ -1,1 +1,1 @@
-ACTION=="add" SUBSYSTEM=="hidraw", ATTRS{idVendor}=="056d", TAG+="uaccess"
+ACTION!="remove" SUBSYSTEM=="hidraw", ATTRS{idVendor}=="056d", MODE="0660", TAG+="uaccess"
