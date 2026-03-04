@@ -378,7 +378,7 @@ eizo_dbg_poll(struct eizo_handle *handle)
         } else if (pfds[0].revents & POLLERR) {
           fprintf(stderr, "%s: communication error (POLLERR)\n", __func__);
           return -1;
-        } else if (pfds[0].events & POLLHUP) {
+        } else if (pfds[0].revents & POLLHUP) {
           fprintf(stderr, "%s: communication error (POLLHUP)\n", __func__);
           return -1;
         }
