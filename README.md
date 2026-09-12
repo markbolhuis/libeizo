@@ -1,7 +1,6 @@
 # libeizo
 
-libeizo is a WIP Linux userspace library to control Eizo EV FlexScan monitors. 
-It is currently in very early stages of development.
+libeizo is a small linux library to introspect and control Eizo Monitors.
 
 ## eizoctl
 
@@ -19,6 +18,7 @@ Options:
         custom-key-lock - Read the available custom key locks, and the currently used one.
         gain-definition - Read all available gain definition values.
         edid            - Read the monitor edid.
+        usage           - Read the the number of hours and minutes the monitor has been used.
         debug           - Put the monitor into 'debug' mode.
         help            - Show this help message.
 ```
