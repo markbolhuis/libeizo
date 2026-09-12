@@ -209,14 +209,14 @@ enum eizo_window_highlight : bool {
     EIZO_WINDOW_HIGHLIGHT_VISIBLE = true,
 };
 
-enum eizo_window : unsigned {
-    EIZO_WINDOW_1 = 0,
-    EIZO_WINDOW_2 = 1,
-    EIZO_WINDOW_3 = 2,
-    EIZO_WINDOW_4 = 3,
+enum eizo_active_window : unsigned {
+    EIZO_ACTIVE_WINDOW_1 = 0,
+    EIZO_ACTIVE_WINDOW_2 = 1,
+    EIZO_ACTIVE_WINDOW_3 = 2,
+    EIZO_ACTIVE_WINDOW_4 = 3,
 
-    EIZO_WINDOW_PBP_2_LEFT  = EIZO_WINDOW_1,
-    EIZO_WINDOW_PBP_2_RIGHT = EIZO_WINDOW_2,
+    EIZO_WINDOW_PBP_2_LEFT  = EIZO_ACTIVE_WINDOW_1,
+    EIZO_WINDOW_PBP_2_RIGHT = EIZO_ACTIVE_WINDOW_2,
 };
 
 enum eizo_compatibility_mode : bool {
@@ -325,28 +325,124 @@ enum eizo_osd_language : unsigned {
     EIZO_OSD_LANGUAGE_CHINESE_TRADITIONAL = 8,
 };
 
-enum eizo_destination : unsigned {
-    EIZO_DESTINATION_JAPAN = 0,
-    EIZO_DESTINATION_INTERNATIONAL = 1,
+enum eizo_destination : bool {
+    EIZO_DESTINATION_JAPAN = false,
+    EIZO_DESTINATION_INTERNATIONAL = true,
 };
 
 enum eizo_split_display_mode : unsigned {
     EIZO_SPLIT_DISPLAY_MODE_SINGLE = 0,
-    EIZO_SPLIT_DISPLAY_MODE_PICTURE_BY_PICTURE = 1,
+    EIZO_SPLIT_DISPLAY_MODE_PICTURE_BY_PICTURE_X2 = 1,
     EIZO_SPLIT_DISPLAY_MODE_PICTURE_IN_PICTURE = 2,
+    EIZO_SPLIT_DISPLAY_MODE_PICTURE_BY_PICTURE_X3 = 3,
+    EIZO_SPLIT_DISPLAY_MODE_PICTURE_BY_PICTURE_X4 = 4,
 };
 
-enum eizo_pbp_layout : unsigned {
-    EIZO_PBP_LAYOUT_1 = 0,
-    EIZO_PBP_LAYOUT_2 = 1,
-    EIZO_PBP_LAYOUT_3 = 2,
-    EIZO_PBP_LAYOUT_4 = 3,
-    EIZO_PBP_LAYOUT_5 = 4,
-    EIZO_PBP_LAYOUT_6 = 5,
+enum eizo_split_display_layout : unsigned {
+    EIZO_SPLIT_DISPLAY_LAYOUT_NONE = 0b00000,
+    EIZO_SPLIT_DISPLAY_LAYOUT_1    = 0b00001,
+    EIZO_SPLIT_DISPLAY_LAYOUT_2    = 0b00010,
+    EIZO_SPLIT_DISPLAY_LAYOUT_3    = 0b00100,
+    EIZO_SPLIT_DISPLAY_LAYOUT_4    = 0b01000,
+    EIZO_SPLIT_DISPLAY_LAYOUT_5    = 0b10000,
 
-    EIZO_PBP_LAYOUT_LEFT_RIGHT = EIZO_PBP_LAYOUT_1,
-    EIZO_PBP_LAYOUT_WIDE_LEFT_NARROW_RIGHT = EIZO_PBP_LAYOUT_2,
-    EIZO_PBP_LAYOUT_NARROW_LEFT_WIDE_RIGHT = EIZO_PBP_LAYOUT_3,
+    // ┌───────────┐
+    // │           │
+    // │           │
+    // │           │
+    // └───────────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X1_SINGLE = EIZO_SPLIT_DISPLAY_LAYOUT_1,
+
+    // ┌─────┬─────┐
+    // │     │     │
+    // │     │     │
+    // │     │     │
+    // └─────┴─────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X2_H1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_1,
+
+    // ┌───────┬───┐
+    // │       │   │
+    // │       │   │
+    // │       │   │
+    // └───────┴───┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X2_H2_1 = EIZO_SPLIT_DISPLAY_LAYOUT_2,
+
+    // ┌───┬───────┐
+    // │   │       │
+    // │   │       │
+    // │   │       │
+    // └───┴───────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X2_H1_2 = EIZO_SPLIT_DISPLAY_LAYOUT_3,
+
+    // ┌───────────┐
+    // │           │
+    // ├───────────┤
+    // │           │
+    // └───────────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X2_V1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_4,
+
+    // ┌───────────┐
+    // │ ┌───┐     │
+    // │ └───┘     │
+    // │           │
+    // └───────────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X2_PIP = EIZO_SPLIT_DISPLAY_LAYOUT_5,
+
+    // ┌─────┬─────┐
+    // │     │     │
+    // │     ├─────┤
+    // │     │     │
+    // └─────┴─────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X3_H1_1_LEFT_V1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_1,
+
+    // ┌─────┬─────┐
+    // │     │     │
+    // ├─────┤     │
+    // │     │     │
+    // └─────┴─────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X3_H1_1_RIGHT_V1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_2,
+
+    // ┌───┬───┬───┐
+    // │   │   │   │
+    // │   │   │   │
+    // │   │   │   │
+    // └───┴───┴───┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X3_H1_1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_3,
+
+    // ┌─────┬─────┐
+    // │     │     │
+    // ├─────┴─────┤
+    // │           │
+    // └───────────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X3_V1_1_TOP_H1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_4,
+
+    // ┌───────────┐
+    // │           │
+    // ├─────┬─────┤
+    // │     │     │
+    // └─────┴─────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X3_V1_1_BOTTOM_H1_1  = EIZO_SPLIT_DISPLAY_LAYOUT_5,
+
+    // ┌─────┬─────┐
+    // │     │     │
+    // ├─────┼─────┤
+    // │     │     │
+    // └─────┴─────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X4_H1_1_V1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_1,
+
+    // ┌───────────┐
+    // │           │
+    // │           │
+    // ├───┬───┬───┤
+    // └───┴───┴───┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X4_V1_1_BOTTOM_H1_1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_2,
+
+    // ┌───┬───┬───┐
+    // ├───┴───┴───┤
+    // │           │
+    // │           │
+    // └───────────┘
+    EIZO_SPLIT_DISPLAY_LAYOUT_X4_V1_1_TOP_H1_1_1 = EIZO_SPLIT_DISPLAY_LAYOUT_3,
 };
 
 enum eizo_pip_size : bool {
@@ -355,10 +451,11 @@ enum eizo_pip_size : bool {
 };
 
 enum eizo_pip_position : unsigned {
-    EIZO_PIP_POSITION_UPPER_LEFT = 0,
-    EIZO_PIP_POSITION_LOWER_LEFT = 1,
-    EIZO_PIP_POSITION_UPPER_RIGHT = 2,
-    EIZO_PIP_POSITION_LOWER_RIGHT = 3,
+    EIZO_PIP_POSITION_NONE = 0,
+    EIZO_PIP_POSITION_RIGHT_TOP = 1,
+    EIZO_PIP_POSITION_LEFT_TOP = 2,
+    EIZO_PIP_POSITION_LEFT_BOTTOM = 3,
+    EIZO_PIP_POSITION_RIGHT_BOTTOM = 4,
 };
 
 enum eizo_button : unsigned {
@@ -375,6 +472,22 @@ enum eizo_button : unsigned {
 enum eizo_boot_logo : bool {
     EIZO_BOOT_LOGO_DISABLED = false,
     EIZO_BOOT_LOGO_ENABLED = true,
+};
+
+enum eizo_save_parameter : unsigned {
+    EIZO_SAVE_CALIBRATION_RESULT,
+    EIZO_SAVE_COLOR,
+    EIZO_SAVE_3D_LUT,
+    EIZO_SAVE_MEDIA_EMU_1D_LUT,
+    EIZO_SAVE_MEDIA_EMU_3D_LUT,
+    EIZO_SAVE_ECOVIEW_SENSE,
+    EIZO_SAVE_PIP_PBP,
+    EIZO_SAVE_CAL_PARAMETER_TO_DICOM_CB,
+    EIZO_SAVE_CAL_PARAMETER_TO_DICOM_BB,
+    EIZO_SAVE_OUTPUT_SEGMENT_PROPERTY,
+    EIZO_SAVE_ECOVIEW_SENSE_SETTING,
+    EIZO_SAVE_IIS_AREA_PROPERTY,
+    EIZO_SAVE_AUDIO_SETTING,
 };
 
 enum eizo_s2431w_signal : unsigned {
@@ -415,6 +528,13 @@ enum eizo_vsync_mode : unsigned {
     EIZO_VSYNC_MODE_DISABLED = 0,
     EIZO_VSYNC_MODE_VERTICAL = 32,
     EIZO_VSYNC_MODE_HORIZONTAL = 96,
+};
+
+enum eizo_rgb_parameter : unsigned {
+    EIZO_RGB_PARAMETER_RED = 0,
+    EIZO_RGB_PARAMETER_GREEN = 1,
+    EIZO_RGB_PARAMETER_BLUE = 2,
+    EIZO_RGB_PARAMETER_WHITE = 3,
 };
 
 struct eizo_factory_panel_luminance {
