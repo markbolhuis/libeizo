@@ -27,6 +27,7 @@ print_help()
     printf("\tcustom-key-lock - Read the available custom key locks, and the currently used one.\n");
     printf("\tgain-definition - Read all available gain definition values.\n");
     printf("\tedid            - Read the monitor edid.\n");
+    printf("\tusage           - Read the the number of hours and minutes the monitor has been used.\n");
     printf("\tdebug           - Put the monitor into 'debug' mode.\n");
     printf("\thelp            - Show this help message.\n");
 }
@@ -110,7 +111,7 @@ main(int argc, const char *argv[])
     }
 
     int i = 0;
-    if (argv[2]) {
+    if (argc >= 3) {
         char *end = nullptr;
         unsigned long u = strtoul(argv[2], &end, 10);
         if (u > INT_MAX) {
@@ -163,6 +164,12 @@ main(int argc, const char *argv[])
         eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_VISIBLE);
         sleep(5);
         eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_HIDDEN);
+    } else if (strcmp(argv[1], "usage") == 0) {
+        long time = 0;
+        res = eizo_get_usage_time(handle, &time);
+        if (res >= EIZO_SUCCESS) {
+            printf("%li hour(s), %li minute(s)\n", time / 60, time % 60);
+        }
     } else {
         fprintf(stderr, "Unknown option \"%s\"\n", argv[1]);
     }
