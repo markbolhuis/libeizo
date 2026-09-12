@@ -192,6 +192,21 @@ eizo_set_debug_mode(struct eizo_handle *handle, enum eizo_debug_mode mode)
 }
 
 enum eizo_result
+eizo_get_debug_mode(struct eizo_handle *handle, enum eizo_debug_mode *mode)
+{
+	uint8_t val[1];
+	enum eizo_result ret = eizo_get_value(handle, EIZO_USAGE_DEBUG_MODE, val, 1);
+	if (ret < EIZO_SUCCESS) {
+		return ret;
+	}
+	if (val[0] > 1) {
+		return EIZO_ERROR_BAD_DATA;
+	}
+	*mode = val[0] == 1;
+	return ret;
+}
+
+enum eizo_result
 eizo_set_osd_indicator(struct eizo_handle *handle, enum eizo_osd_indicator indicator)
 {
     return eizo_set_uint16(handle, EIZO_USAGE_OSD_INDICATOR, indicator ? 0x4000 : 0x8000);
