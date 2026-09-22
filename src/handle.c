@@ -20,7 +20,7 @@ struct eizo_handle {
     uint16_t counter;
     enum eizo_pid pid;
     unsigned long serial;
-    char product[17];
+    char *product;
     struct eizo_control *ctrl;
     size_t n_ctrl;
     struct {
@@ -86,7 +86,7 @@ eizo_get_counter(struct eizo_handle *handle, uint16_t *counter)
 }
 
 static enum eizo_result
-eizo_get_serial_product(struct eizo_handle *handle, unsigned long *serial, char product[17])
+eizo_get_serial_product(struct eizo_handle *handle, unsigned long *serial, char **product)
 {
     char buf[25];
     buf[0] = (char)handle->rid.sn_prod;
@@ -96,26 +96,24 @@ eizo_get_serial_product(struct eizo_handle *handle, unsigned long *serial, char 
         return EIZO_ERROR_IO;
     }
 
-    locale_t loc = newlocale(LC_CTYPE_MASK, "C", nullptr);
-    int i;
-    for (i = 0; i < 16; ++i) {
-        if (!isalnum_l(buf[9 + i], loc)) {
-            break;
-        }
-        product[i] = buf[9 + i];
+    int len = 0;
+    while (len < 16 && buf[9 + len] != ' ') {
+        ++len;
     }
-    product[i] = '\0';
-    freelocale(loc);
+    char *prod = strndup(buf + 9, len);
 
     buf[9] = '\0';
     char *end = nullptr;
     unsigned long sn = strtoul(buf + 1, &end, 10);
 
-    if (end == buf + 9) {
-        *serial = sn;
-    } else {
+    if (end != buf + 9) {
         fprintf(stderr, "%s: failed to convert serial string to ulong.\n", __func__);
+        free(prod);
+        return EIZO_ERROR_BAD_DATA;
     }
+
+    *serial = sn;
+    *product = prod;
 
     return EIZO_SUCCESS;
 }
@@ -463,7 +461,7 @@ eizo_new(const int fd, struct eizo_handle **handle)
     res = eizo_get_counter(h, &h->counter);
     err_check(res, "Failed to read eizo handle counter.");
 
-    res = eizo_get_serial_product(h, &h->serial, h->product);
+    res = eizo_get_serial_product(h, &h->serial, &h->product);
     err_check(res, "Failed to read eizo serial/product string.");
 
     res = eizo_parse_secondary_descriptor(h);
@@ -483,9 +481,8 @@ err_hidraw:
 void
 eizo_close(struct eizo_handle *handle)
 {
-    if (handle->ctrl) {
-        free(handle->ctrl);
-    }
+    free(handle->product);
+    free(handle->ctrl);
     close(handle->fd);
     free(handle);
 }
