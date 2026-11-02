@@ -14,12 +14,13 @@
 void
 print_help()
 {
-    printf("Usage: ./eizoctl <option> [monitor]\n");
+    printf("Usage: ./eizoctl <option> [monitor] [input-port]\n");
     printf("\n");
     printf("Options:\n");
     printf("\tlist            - List all available monitors.\n");
     printf("\tidentify        - Identify the monitor.\n");
     printf("\tpoll            - Poll the monitor for events.\n");
+    printf("\tinput           - Read or set the input port (see 'help input').\n");
     printf("\tdescriptor      - Read the eizo specific HID report descriptor.\n");
     printf("\tkey-pairs       - Read the unknown key value pairs behind usage ff300009.\n");
     printf("\tread-all        - Read all values for every usage.\n");
@@ -30,6 +31,24 @@ print_help()
     printf("\tusage           - Read the the number of hours and minutes the monitor has been used.\n");
     printf("\tdebug           - Put the monitor into 'debug' mode.\n");
     printf("\thelp            - Show this help message.\n");
+}
+
+static void
+print_input_help()
+{
+    printf("Usage: ./eizoctl input <monitor> [port]\n");
+    printf("\n");
+    printf("Read or set the active input port of a monitor.\n");
+    printf("Omit [port] to read the current input.\n");
+    printf("\n");
+    printf("Available port names:\n");
+    printf("  dsub1, dsub2, dvi1, dvi2, dp1, dp2,\n");
+    printf("  hdmi1, hdmi2, sdi1, sdi2, sdiab, sdiba,\n");
+    printf("  d1, d2, composite1, composite2, tv1, tv2, usbc\n");
+    printf("\n");
+    printf("Not all ports are supported by every monitor.\n");
+    printf("Input switching may fail if the requested port is not supported or ");
+    printf("the monitor is in power-saving mode.\n");
 }
 
 struct sd_device *
@@ -101,7 +120,14 @@ main(int argc, const char *argv[])
     }
 
     if (strcmp(argv[1], "help") == 0) {
-        print_help();
+        if (argc == 2) {
+            print_help();
+        } else if (argc == 3 && strcmp(argv[2], "input") == 0) {
+            print_input_help();
+        } else {
+            fprintf(stderr, "Unknown help topic\n");
+            return EXIT_FAILURE;
+        }
         return EXIT_SUCCESS;
     }
 
@@ -164,6 +190,41 @@ main(int argc, const char *argv[])
         eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_VISIBLE);
         sleep(5);
         eizo_set_osd_indicator(handle, EIZO_OSD_INDICATOR_HIDDEN);
+    } else if (strcmp(argv[1], "input") == 0) {
+        if (argc == 4) {
+            enum eizo_input_port port;
+            res = eizo_input_port_from_string(argv[3], &port);
+            if (res < EIZO_SUCCESS) {
+                fprintf(stderr, "Invalid input port: %s\n", argv[3]);
+                eizo_close(handle);
+                return EXIT_FAILURE;
+            }
+            res = eizo_set_input_port(handle, port);
+            if (res < EIZO_SUCCESS) {
+                fprintf(stderr, "Failed to set input port: %d\n", res);
+                if (res == EIZO_ERROR_NOT_PERMITTED) {
+                    fprintf(stderr,
+                            "The requested input port may not be supported, "
+                            "or the monitor may be in power-saving mode.\n");
+                }
+                eizo_close(handle);
+                return EXIT_FAILURE;
+            }
+        } else if (argc == 3) {
+            enum eizo_input_port port;
+            res = eizo_get_input_port(handle, &port);
+            if (res < EIZO_SUCCESS) {
+                fprintf(stderr, "Failed to read input port: %d\n", res);
+                eizo_close(handle);
+                return EXIT_FAILURE;
+            }
+            printf("Input port: %s (0x%04x)\n",
+                   eizo_input_port_to_string(port), (unsigned)port);
+        } else {
+            fprintf(stderr, "Invalid number of arguments\n");
+            eizo_close(handle);
+            return EXIT_FAILURE;
+        }
     } else if (strcmp(argv[1], "usage") == 0) {
         long time = 0;
         res = eizo_get_usage_time(handle, &time);

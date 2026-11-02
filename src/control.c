@@ -2,6 +2,7 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 
 #include <sys/param.h>
 
@@ -210,4 +211,77 @@ enum eizo_result
 eizo_set_osd_indicator(struct eizo_handle *handle, enum eizo_osd_indicator indicator)
 {
     return eizo_set_uint16(handle, EIZO_USAGE_OSD_INDICATOR, indicator ? 0x4000 : 0x8000);
+}
+
+enum eizo_result
+eizo_get_input_port(struct eizo_handle *handle, enum eizo_input_port *port)
+{
+    uint16_t value = 0;
+    enum eizo_result res =
+        eizo_get_uint16(handle, EIZO_USAGE_INPUT_PORT, &value);
+    if (res >= EIZO_SUCCESS) {
+        *port = (enum eizo_input_port)value;
+    }
+    return res;
+}
+
+enum eizo_result
+eizo_set_input_port(struct eizo_handle *handle, enum eizo_input_port port)
+{
+    return eizo_set_uint16(handle, EIZO_USAGE_INPUT_PORT, (uint16_t)port);
+}
+
+static const struct {
+    enum eizo_input_port port;
+    const char *name;
+} input_ports[] = {
+    { EIZO_INPUT_PORT_UNDEFINED, "undefined" },
+    { EIZO_INPUT_PORT_DSUB1, "dsub1" },
+    { EIZO_INPUT_PORT_DSUB2, "dsub2" },
+    { EIZO_INPUT_PORT_DVI1, "dvi1" },
+    { EIZO_INPUT_PORT_DVI2, "dvi2" },
+    { EIZO_INPUT_PORT_DP1, "dp1" },
+    { EIZO_INPUT_PORT_DP2, "dp2" },
+    { EIZO_INPUT_PORT_HDMI1, "hdmi1" },
+    { EIZO_INPUT_PORT_HDMI2, "hdmi2" },
+    { EIZO_INPUT_PORT_SDI1, "sdi1" },
+    { EIZO_INPUT_PORT_SDI2, "sdi2" },
+    { EZIO_INPUT_PORT_SDIAB, "sdiab" },
+    { EZIO_INPUT_PORT_SDIBA, "sdiba" },
+    { EIZO_INPUT_PORT_D1, "d1" },
+    { EIZO_INPUT_PORT_D2, "d2" },
+    { EIZO_INPUT_PORT_COMPOSITE1, "composite1" },
+    { EIZO_INPUT_PORT_COMPOSITE2, "composite2" },
+    { EIZO_INPUT_PORT_TV1, "tv1" },
+    { EIZO_INPUT_PORT_TV2, "tv2" },
+    { EIZO_INPUT_PORT_USBC, "usbc" },
+};
+
+const char *
+eizo_input_port_to_string(enum eizo_input_port port)
+{
+    size_t count = sizeof(input_ports) / sizeof(input_ports[0]);
+    for (size_t i = 0; i < count; ++i) {
+        if (input_ports[i].port == port) {
+            return input_ports[i].name;
+        }
+    }
+    return "unknown";
+}
+
+enum eizo_result
+eizo_input_port_from_string(const char *name, enum eizo_input_port *port)
+{
+    if (name == NULL || port == NULL) {
+        return EIZO_ERROR_INVALID_ARGUMENT;
+    }
+    size_t count = sizeof(input_ports) / sizeof(input_ports[0]);
+    for (size_t i = 0; i < count; ++i) {
+        if (input_ports[i].port != EIZO_INPUT_PORT_UNDEFINED &&
+            strcmp(input_ports[i].name, name) == 0) {
+            *port = input_ports[i].port;
+            return EIZO_SUCCESS;
+        }
+    }
+    return EIZO_ERROR_INVALID_ARGUMENT;
 }

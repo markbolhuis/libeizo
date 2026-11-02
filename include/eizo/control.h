@@ -598,3 +598,15 @@ eizo_get_debug_mode(struct eizo_handle *handle, enum eizo_debug_mode *mode);
 
 enum eizo_result
 eizo_set_osd_indicator(eizo_handle_t handle, enum eizo_osd_indicator indicator);
+
+enum eizo_result
+eizo_get_input_port(eizo_handle_t handle, enum eizo_input_port *port);
+
+enum eizo_result
+eizo_set_input_port(eizo_handle_t handle, enum eizo_input_port port);
+
+const char *
+eizo_input_port_to_string(enum eizo_input_port port);
+
+enum eizo_result
+eizo_input_port_from_string(const char *name, enum eizo_input_port *port);
